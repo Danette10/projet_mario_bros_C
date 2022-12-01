@@ -1,4 +1,3 @@
-#define SDL_MAIN_HANDLED
 #include <SDL/SDL.h>
 
 int main(int argc, char * argv[]) {
