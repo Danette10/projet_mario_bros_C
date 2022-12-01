@@ -1,17 +1,43 @@
-#include <SDL/SDL.h>
+#include <stdio.h>
+#include <SDL2/SDL.h>
 
-int main(int argc, char * argv[]) {
-    SDL_Init(SDL_INIT_VIDEO);
-    SDL_Surface * ecran = SDL_SetVideoMode(800, 600, 32,SDL_HWSURFACE);
+const int WIDTH = 800, HEIGHT = 600;
+
+int main(int argc, char *argv[]) {
+    SDL_Window *window;
+    SDL_Renderer *renderer;
+    if(SDL_Init(SDL_INIT_EVERYTHING) < 0) {
+        printf("SDL_Init failed: %s\n", SDL_GetError());
+        return 1;
+    }
+
+    window = SDL_CreateWindow("Hello, World!",
+                              SDL_WINDOWPOS_UNDEFINED,
+                              SDL_WINDOWPOS_UNDEFINED,
+                              WIDTH, HEIGHT,
+                              SDL_WINDOW_ALLOW_HIGHDPI);
+    if(window == NULL) {
+        printf("Could not create window: %s\n", SDL_GetError());
+        return 1;
+    }
+
+    renderer = SDL_CreateRenderer(window, -1, 0);
+    SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+    SDL_RenderClear(renderer);
+
+    SDL_RenderPresent(renderer);
+
     SDL_Event event;
-    int active = 1;
-    while(active) {
-        SDL_WaitEvent(&event);
-        switch(event.type) {
-            case SDL_QUIT : active = 0; break;
+    while(1) {
+        if(SDL_PollEvent(&event)) {
+            if(event.type == SDL_QUIT) {
+                break;
+            }
         }
     }
-    SDL_FreeSurface(ecran);
+
+    SDL_DestroyWindow(window);
+
     SDL_Quit();
-    exit(EXIT_SUCCESS);
+    return 0;
 }
