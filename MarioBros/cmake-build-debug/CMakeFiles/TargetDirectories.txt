@@ -1,0 +1,3 @@
+C:/Users/PC-Dev/Documents/GitHub/COURS/2022-2023/Projets/C/MarioBros/cmake-build-debug/CMakeFiles/MarioBros.dir
+C:/Users/PC-Dev/Documents/GitHub/COURS/2022-2023/Projets/C/MarioBros/cmake-build-debug/CMakeFiles/edit_cache.dir
+C:/Users/PC-Dev/Documents/GitHub/COURS/2022-2023/Projets/C/MarioBros/cmake-build-debug/CMakeFiles/rebuild_cache.dir
