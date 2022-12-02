@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include <SQLAPI.h>
+#include <stdlib.h>
 #include <SDL_audio.h>
 #include <SDL_video.h>
 #include <SDL.h>
