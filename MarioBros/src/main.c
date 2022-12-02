@@ -14,13 +14,15 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    // Modifier l'icon de la fenetre
-    SDL_Surface *icon = SDL_LoadBMP("../include/ressources/images/icon/mario_logo.bmp");
-
     window = SDL_CreateWindow("Mario Bros", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, WIDTH, HEIGHT, SDL_WINDOW_SHOWN);
 
-    // Modifier l'icon de la fenetre
+    SDL_Surface *icon = SDL_LoadBMP("../include/ressources/images/icon/mario_logo.bmp");
     SDL_SetWindowIcon(window, icon);
+    
+    SDL_Surface *cursor = SDL_LoadBMP("../include/ressources/images/icon/Mario_s-Normal.bmp");
+    SDL_SetColorKey(cursor, SDL_TRUE, SDL_MapRGB(cursor->format, 255, 255, 255));
+    SDL_Cursor *cursor2 = SDL_CreateColorCursor(cursor, 0, 0);
+    SDL_SetCursor(cursor2);
 
     if(window == NULL) {
         printf("Could not create window: %s\n", SDL_GetError());
