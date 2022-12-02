@@ -13,13 +13,10 @@ int main(int argc, char *argv[]) {
         printf("SDL_Init failed: %s\n", SDL_GetError());
         return 1;
     }
-
-    // Modifier l'icon de la fenetre
-    SDL_Surface *icon = SDL_LoadBMP("../include/ressources/images/icon/mario_logo.bmp");
-
     window = SDL_CreateWindow("Mario Bros", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, WIDTH, HEIGHT, SDL_WINDOW_SHOWN);
 
-    // Modifier l'icon de la fenetre
+    SDL_Surface *icon = SDL_LoadBMP("../include/ressources/images/icon/mario_logo.bmp");
+
     SDL_SetWindowIcon(window, icon);
 
     if(window == NULL) {
