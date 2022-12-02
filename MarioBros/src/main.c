@@ -1,5 +1,8 @@
 #include <stdio.h>
-#include <SDL2/SDL.h>
+#include <SQLAPI.h>
+#include <SDL_audio.h>
+#include <SDL_video.h>
+#include <SDL.h>
 
 const int WIDTH = 800, HEIGHT = 600;
 
