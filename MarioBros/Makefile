@@ -1,0 +1,16 @@
+CC = gcc
+EXEC = bin/MarioBros
+SRC = $(wildcard src/*.c)
+OBJ = $(SRC:.c=.o)
+CFLAGS = -Wall `sdl2-config --cflags --libs`
+
+all: $(EXEC)
+
+%.o: %.c
+	$(CC) -o $@ -c $< $(CFLAGS)
+
+$(EXEC): $(OBJ)
+	$(CC) -o $@ $^ $(CFLAGS)
+
+clean:
+	rm -rf src/*.o
