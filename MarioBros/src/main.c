@@ -4,11 +4,10 @@
 #include <SDL_video.h>
 #include <SDL.h>
 
-const int WIDTH = 1000, HEIGHT = 800;
+const int WIDTH = 900, HEIGHT = 550;
 
 int main(int argc, char *argv[]) {
     SDL_Window *window;
-    //SDL_Renderer *renderer;
     if(SDL_Init(SDL_INIT_EVERYTHING) < 0) {
         printf("SDL_Init failed: %s\n", SDL_GetError());
         return 1;
@@ -36,6 +35,12 @@ int main(int argc, char *argv[]) {
     SDL_AudioDeviceID deviceId = SDL_OpenAudioDevice(NULL, 0, &wavSpec, NULL, 0);
     SDL_PauseAudioDevice(deviceId, 0);
 
+    char *menuArray[4] = {"../include/ressources/images/menu/menu_new_game_selected.bmp",
+                          "../include/ressources/images/menu/menu_load_game_selected.bmp",
+                            "../include/ressources/images/menu/menu_shop_selected.bmp",
+                            "../include/ressources/images/menu/menu_quit_selected.bmp"};
+    int count = 0;
+
     while (1) {
 
         SDL_Event event;
@@ -49,6 +54,27 @@ int main(int argc, char *argv[]) {
                 SDL_DestroyWindow(window);
                 SDL_Quit();
                 return 0;
+
+            }
+            if (event.type == SDL_KEYDOWN) {
+                // Compte le nombre de fois que l'on appuie sur une touche
+
+                if(count > 4) {
+                    count = 0;
+                }else{
+                    count++;
+                }
+                if (event.key.keysym.sym == SDLK_DOWN) {
+
+                    // On charge l'image suivante
+                    SDL_Surface *menu = SDL_LoadBMP(menuArray[count]);
+
+                    SDL_Surface *menuSizeWindow = SDL_CreateRGBSurface(0, WIDTH, HEIGHT, 32, 0, 0, 0, 0);
+                    SDL_BlitScaled(menu, NULL, menuSizeWindow, NULL);
+                    // Affichage de l'image
+                    SDL_BlitSurface(menuSizeWindow, NULL, SDL_GetWindowSurface(window), NULL);
+                    SDL_UpdateWindowSurface(window);
+                }
 
             }
 
