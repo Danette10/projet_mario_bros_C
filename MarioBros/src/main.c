@@ -3,8 +3,8 @@
 #include <SDL_audio.h>
 #include <SDL_video.h>
 #include <SDL.h>
-
-const int WIDTH = 900, HEIGHT = 550;
+#include "../include/define.h"
+#include "../include/menu.h"
 
 int main(int argc, char *argv[]) {
     SDL_Window *window;
@@ -12,6 +12,7 @@ int main(int argc, char *argv[]) {
         printf("SDL_Init failed: %s\n", SDL_GetError());
         return 1;
     }
+
 
     window = SDL_CreateWindow("Mario Bros", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, WIDTH, HEIGHT, SDL_WINDOW_SHOWN);
 
@@ -39,8 +40,10 @@ int main(int argc, char *argv[]) {
                           "../include/ressources/images/menu/menu_load_game_selected.bmp",
                             "../include/ressources/images/menu/menu_shop_selected.bmp",
                             "../include/ressources/images/menu/menu_quit_selected.bmp"};
-    int count = 0;
 
+    displayMenu(menuArray, 0, window);
+
+    int menuIndex = 0;
     while (1) {
 
         SDL_Event event;
@@ -56,26 +59,17 @@ int main(int argc, char *argv[]) {
                 return 0;
 
             }
-            if (event.type == SDL_KEYDOWN) {
-                // Compte le nombre de fois que l'on appuie sur une touche
 
-                if(count > 4) {
-                    count = 0;
-                }else{
-                    count++;
-                }
+            if (event.type == SDL_KEYDOWN) {
                 if (event.key.keysym.sym == SDLK_DOWN) {
 
-                    // On charge l'image suivante
-                    SDL_Surface *menu = SDL_LoadBMP(menuArray[count]);
+                    displayMenu(menuArray, menuIndex, window);
 
-                    SDL_Surface *menuSizeWindow = SDL_CreateRGBSurface(0, WIDTH, HEIGHT, 32, 0, 0, 0, 0);
-                    SDL_BlitScaled(menu, NULL, menuSizeWindow, NULL);
-                    // Affichage de l'image
-                    SDL_BlitSurface(menuSizeWindow, NULL, SDL_GetWindowSurface(window), NULL);
-                    SDL_UpdateWindowSurface(window);
+                    menuIndex++;
+                    if (menuIndex == 4) {
+                        menuIndex = 0;
+                    }
                 }
-
             }
 
         }
