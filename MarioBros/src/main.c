@@ -3,16 +3,16 @@
 #include <SDL_audio.h>
 #include <SDL_video.h>
 #include <SDL.h>
-
-const int WIDTH = 1000, HEIGHT = 800;
+#include "../include/define.h"
+#include "../include/menu.h"
 
 int main(int argc, char *argv[]) {
     SDL_Window *window;
-    //SDL_Renderer *renderer;
     if(SDL_Init(SDL_INIT_EVERYTHING) < 0) {
         printf("SDL_Init failed: %s\n", SDL_GetError());
         return 1;
     }
+
 
     window = SDL_CreateWindow("Mario Bros", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, WIDTH, HEIGHT, SDL_WINDOW_SHOWN);
 
@@ -36,6 +36,14 @@ int main(int argc, char *argv[]) {
     SDL_AudioDeviceID deviceId = SDL_OpenAudioDevice(NULL, 0, &wavSpec, NULL, 0);
     SDL_PauseAudioDevice(deviceId, 0);
 
+    char *menuArray[4] = {"../include/ressources/images/menu/menu_new_game_selected.bmp",
+                          "../include/ressources/images/menu/menu_load_game_selected.bmp",
+                            "../include/ressources/images/menu/menu_shop_selected.bmp",
+                            "../include/ressources/images/menu/menu_quit_selected.bmp"};
+
+    displayMenu(menuArray, 0, window);
+
+    int menuIndex = 0;
     while (1) {
 
         SDL_Event event;
@@ -50,6 +58,18 @@ int main(int argc, char *argv[]) {
                 SDL_Quit();
                 return 0;
 
+            }
+
+            if (event.type == SDL_KEYDOWN) {
+                if (event.key.keysym.sym == SDLK_DOWN) {
+
+                    displayMenu(menuArray, menuIndex, window);
+
+                    menuIndex++;
+                    if (menuIndex == 4) {
+                        menuIndex = 0;
+                    }
+                }
             }
 
         }
