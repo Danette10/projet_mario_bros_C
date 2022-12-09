@@ -43,7 +43,7 @@ int main(int argc, char *argv[]) {
 
     displayMenu(menuArray, 0, window);
 
-    int menuIndex = 0;
+    int menuIndex = 1;
     while (1) {
 
         SDL_Event event;
@@ -66,8 +66,28 @@ int main(int argc, char *argv[]) {
                     displayMenu(menuArray, menuIndex, window);
 
                     menuIndex++;
-                    if (menuIndex == 4) {
+                    if (menuIndex == 5) {
                         menuIndex = 0;
+                    }
+                }
+
+                if (event.key.keysym.sym == SDLK_SPACE) {
+                    if(menuIndex == 1) {
+                        printf("New game\n");
+                    }
+                    if(menuIndex == 2) {
+                        printf("Load game\n");
+                    }
+                    if(menuIndex == 3) {
+                        printf("Shop\n");
+                    }
+                    if(menuIndex == 4) {
+                        printf("Quit\n");
+                        SDL_CloseAudioDevice(deviceId);
+                        SDL_FreeWAV(wavBuffer);
+                        SDL_DestroyWindow(window);
+                        SDL_Quit();
+                        return 0;
                     }
                 }
             }
