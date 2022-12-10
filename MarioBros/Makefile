@@ -10,7 +10,7 @@ all: $(EXEC)
 	$(CC) -o $@ -c $< $(CFLAGS)
 
 $(EXEC): $(OBJ)
-	$(CC) -o $@ $^ $(CFLAGS)
+	$(CC) -o $@ $^ $(CFLAGS) icon.res
 
 clean:
 	rm -rf src/*.o
