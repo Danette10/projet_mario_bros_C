@@ -3,8 +3,8 @@
 #include <SDL_audio.h>
 #include <SDL_video.h>
 #include <SDL.h>
-#include "../include/define.h"
-#include "../include/menu.h"
+#include "../include/headers/define.h"
+#include "../include/headers/menu.h"
 
 int main(int argc, char *argv[]) {
     SDL_Window *window;
@@ -63,12 +63,13 @@ int main(int argc, char *argv[]) {
             if (event.type == SDL_KEYDOWN) {
                 if (event.key.keysym.sym == SDLK_DOWN) {
 
+                    if (menuIndex == 4) {
+                        menuIndex = 0;
+                    }
+
                     displayMenu(menuArray, menuIndex, window);
 
                     menuIndex++;
-                    if (menuIndex == 5) {
-                        menuIndex = 0;
-                    }
                 }
 
                 if (event.key.keysym.sym == SDLK_SPACE) {
