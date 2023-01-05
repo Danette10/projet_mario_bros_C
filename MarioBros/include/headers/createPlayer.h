@@ -48,11 +48,18 @@ void createPlayer(SDL_Renderer *renderer)
             }
 
             if (event.type == SDL_KEYDOWN) {
-                // Si la touche est la flèche de droite
                 if (event.key.keysym.sym == SDLK_RIGHT) {
+                    int type = 1;
                     SDL_Delay(150);
                     if (playerRect.x < WIDTH - playerRect.w) {
-                        playerRect.x = playerMove(renderer, texture, playerRect);
+                        playerRect.x = playerMove(renderer, texture, playerRect, type);
+                    }
+                }
+                if(event.key.keysym.sym == SDLK_LEFT) {
+                    int type = 2;
+                    SDL_Delay(150);
+                    if (playerRect.x > 0) {
+                        playerRect.x = playerMove(renderer, texture, playerRect, type);
                     }
                 }
             }
