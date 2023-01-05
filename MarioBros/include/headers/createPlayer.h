@@ -50,9 +50,10 @@ void createPlayer(SDL_Renderer *renderer)
             if (event.type == SDL_KEYDOWN) {
                 // Si la touche est la flèche de droite
                 if (event.key.keysym.sym == SDLK_RIGHT) {
-                    // On déplace le joueur de 10 pixels vers la droite
-                    playerRect.x = playerMove(renderer, texture, playerRect);
-                    //playerMove(renderer, texture, playerRect);
+                    SDL_Delay(150);
+                    if (playerRect.x < WIDTH - playerRect.w) {
+                        playerRect.x = playerMove(renderer, texture, playerRect);
+                    }
                 }
             }
         }
