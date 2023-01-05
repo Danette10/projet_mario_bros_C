@@ -5,7 +5,8 @@
 #include <SDL.h>
 #include "../include/headers/define.h"
 #include "../include/headers/menu.h"
-#include "../include/headers/newGame.h"
+#include "../include/headers/createBackground.h"
+#include "../include/headers/createPlayer.h"
 
 int main(int argc, char *argv[]) {
     SDL_Window *window;
@@ -78,8 +79,14 @@ int main(int argc, char *argv[]) {
 
                 if (event.key.keysym.sym == SDLK_SPACE) {
                     if(menuIndex == 1) {
-                        newGame(renderer);
-                        printf("New game\n");
+
+                        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
+                        SDL_RenderClear(renderer);
+                        SDL_RenderPresent(renderer);
+
+                        createBackground(renderer);
+                        createPlayer(renderer);
+
                     }
                     if(menuIndex == 2) {
                         printf("Load game\n");
