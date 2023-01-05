@@ -1,13 +1,13 @@
 #include <SDL_video.h>
 #include "define.h"
 
-void displayMenu(char *menuArray[], int menuIndex, SDL_Renderer *renderer)
+void createBackground(SDL_Renderer *renderer)
 {
-// On charge l'image suivante
-    SDL_Surface *menu = SDL_LoadBMP(menuArray[menuIndex]);
+// On charge l'image du décor
+    SDL_Surface *background = SDL_LoadBMP("../include/ressources/images/background/desert/desert1.bmp");
 
     // On crée une texture à partir de l'image
-    SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, menu);
+    SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, background);
     if (texture == NULL) {
         printf("Could not create texture: %s\n", SDL_GetError());
         return;
@@ -19,5 +19,5 @@ void displayMenu(char *menuArray[], int menuIndex, SDL_Renderer *renderer)
 
 // On libère la mémoire
     SDL_DestroyTexture(texture);
-    SDL_FreeSurface(menu);
+    SDL_FreeSurface(background);
 }
