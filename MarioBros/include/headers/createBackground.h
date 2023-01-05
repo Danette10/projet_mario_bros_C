@@ -13,11 +13,18 @@ void createBackground(SDL_Renderer *renderer)
         return;
     }
 
-// On affiche la texture dans la fenêtre
-    SDL_RenderCopy(renderer, texture, NULL, NULL);
+    // On crée un rectangle pour positionner le décor à l'écran
+    SDL_Rect backgroundRect;
+    backgroundRect.x = 0;
+    backgroundRect.y = 0;
+    backgroundRect.w = WIDTH;
+    backgroundRect.h = HEIGHT;
+
+    // On affiche le décor à l'écran
+    SDL_RenderCopy(renderer, texture, NULL, &backgroundRect);
     SDL_RenderPresent(renderer);
 
-// On libère la mémoire
+    // On libère la mémoire
     SDL_DestroyTexture(texture);
     SDL_FreeSurface(background);
 }
