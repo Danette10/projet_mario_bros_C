@@ -62,6 +62,26 @@ void createPlayer(SDL_Renderer *renderer)
                         playerRect.x = playerMove(renderer, texture, playerRect, type);
                     }
                 }
+                if(event.key.keysym.sym == SDLK_SPACE) {
+
+                    if (playerRect.y == 150) {
+                        int type = 3;
+                        SDL_Delay(150);
+
+                        playerRect.y = playerMove(renderer, texture, playerRect, type);
+
+                        SDL_Delay(500);
+
+                    }
+
+                    // Efface la texture du joueur
+                    SDL_RenderClear(renderer);
+                    createBackground(renderer);
+                    playerRect.y = 150;
+                    SDL_RenderCopy(renderer, texture, NULL, &playerRect);
+                    SDL_RenderPresent(renderer);
+
+                }
             }
         }
     }

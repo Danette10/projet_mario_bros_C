@@ -11,6 +11,7 @@ int playerMove(SDL_Renderer *renderer, SDL_Texture *texture, SDL_Rect playerRect
 
             // On déplace le joueur de 10 pixels vers la droite
             playerRect.x += 10;
+            playerRect.y = 150;
 
             // On affiche à nouveau le joueur et le décor
             createBackground(renderer);
@@ -22,6 +23,7 @@ int playerMove(SDL_Renderer *renderer, SDL_Texture *texture, SDL_Rect playerRect
         case 2:
 
             playerRect.x -= 10;
+            playerRect.y = 150;
 
             createBackground(renderer);
             // Flip the player
@@ -29,6 +31,21 @@ int playerMove(SDL_Renderer *renderer, SDL_Texture *texture, SDL_Rect playerRect
             SDL_RenderPresent(renderer);
 
             break;
+
+        case 3:
+
+                playerRect.y -= 30;
+                // Garder sa position en x
+                int x = playerRect.x;
+
+                createBackground(renderer);
+                SDL_RenderCopy(renderer, texture, NULL, &playerRect);
+                SDL_RenderPresent(renderer);
+
+                // On replace le joueur à sa position en x
+                playerRect.x = x;
+
+                break;
 
         default:
 
