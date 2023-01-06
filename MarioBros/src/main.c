@@ -7,6 +7,9 @@
 #include "../include/headers/menu.h"
 #include "../include/headers/createBackground.h"
 #include "../include/headers/createPlayer.h"
+#include "../include/headers/functions.h"
+
+// 22*50 la taille d'un mario dans la tileset (supprimer la première image)
 
 int main(int argc, char *argv[]) {
     SDL_Window *window;
