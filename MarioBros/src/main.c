@@ -3,13 +3,7 @@
 #include <SDL_audio.h>
 #include <SDL_video.h>
 #include <SDL.h>
-#include "../include/headers/define.h"
 #include "../include/headers/menu.h"
-#include "../include/headers/createBackground.h"
-#include "../include/headers/createPlayer.h"
-#include "../include/headers/functions.h"
-
-// 22*50 la taille d'un mario dans la tileset (supprimer la première image)
 
 int main(int argc, char *argv[]) {
     SDL_Window *window;
@@ -44,14 +38,17 @@ int main(int argc, char *argv[]) {
     SDL_AudioDeviceID deviceId = SDL_OpenAudioDevice(NULL, 0, &wavSpec, NULL, 0);
     SDL_PauseAudioDevice(deviceId, 0);
 
-    char *menuArray[4] = {"../include/ressources/images/menu/menu_new_game_selected.bmp",
-                          "../include/ressources/images/menu/menu_load_game_selected.bmp",
-                          "../include/ressources/images/menu/menu_shop_selected.bmp",
-                          "../include/ressources/images/menu/menu_quit_selected.bmp"};
+    Menu menu;
 
-    displayMenu(menuArray, 0, renderer);
+    initMenu(&menu, 4);
 
-    int menuIndex = 1;
+    addOption(&menu, "../include/ressources/images/menu/menu_new_game_selected.bmp", 0);
+    addOption(&menu, "../include/ressources/images/menu/menu_load_game_selected.bmp", 1);
+    addOption(&menu, "../include/ressources/images/menu/menu_shop_selected.bmp", 2);
+    addOption(&menu, "../include/ressources/images/menu/menu_quit_selected.bmp", 3);
+
+    displayMenu(&menu, renderer);
+
     while (1) {
 
         SDL_Event event;
@@ -69,45 +66,8 @@ int main(int argc, char *argv[]) {
 
             }
 
-            if (event.type == SDL_KEYDOWN) {
-                if (event.key.keysym.sym == SDLK_DOWN) {
-                    if (menuIndex == 4) {
-                        menuIndex = 0;
-                    }
+            handleMenuNavigation(&menu, renderer, &event);
 
-                    displayMenu(menuArray, menuIndex, renderer);
-
-                    menuIndex++;
-                }
-
-                if (event.key.keysym.sym == SDLK_SPACE) {
-                    if(menuIndex == 1) {
-
-                        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
-                        SDL_RenderClear(renderer);
-                        SDL_RenderPresent(renderer);
-
-                        createBackground(renderer);
-                        createPlayer(renderer);
-
-                    }
-                    if(menuIndex == 2) {
-                        printf("Load game\n");
-                    }
-                    if(menuIndex == 3) {
-                        printf("Shop\n");
-                    }
-                    if(menuIndex == 4) {
-                        printf("Quit\n");
-                        SDL_CloseAudioDevice(deviceId);
-                        SDL_FreeWAV(wavBuffer);
-                        SDL_DestroyRenderer(renderer);
-                        SDL_DestroyWindow(window);
-                        SDL_Quit();
-                        return 0;
-                    }
-                }
-            }
         }
 
         if (SDL_GetQueuedAudioSize(deviceId) == 0) {

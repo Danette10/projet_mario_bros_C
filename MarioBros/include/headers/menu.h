@@ -1,23 +1,26 @@
 #include <SDL_video.h>
 #include "define.h"
 
-void displayMenu(char *menuArray[], int menuIndex, SDL_Renderer *renderer)
-{
-// On charge l'image suivante
-    SDL_Surface *menu = SDL_LoadBMP(menuArray[menuIndex]);
+typedef struct Menu Menu;
+typedef SDL_Renderer Renderer;
 
-    // On crée une texture à partir de l'image
-    SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, menu);
-    if (texture == NULL) {
-        printf("Could not create texture: %s\n", SDL_GetError());
-        return;
-    }
+struct Menu {
+    char **options; // array of BMP file paths for the options
+    int optionCount; // number of options in the menu
+    int currentIndex; // index of the currently selected option
+};
 
-// On affiche la texture dans la fenêtre
-    SDL_RenderCopy(renderer, texture, NULL, NULL);
-    SDL_RenderPresent(renderer);
+// Initialize a new menu with a given number of options
+void initMenu(Menu *menu, int optionCount);
 
-// On libère la mémoire
-    SDL_DestroyTexture(texture);
-    SDL_FreeSurface(menu);
-}
+// Add an option (BMP file) to the menu
+void addOption(Menu *menu, char *option, int index);
+
+// Display the menu on the screen using the provided renderer
+void displayMenu(Menu *menu, Renderer *renderer);
+
+// Handle arrow key presses for menu navigation
+void handleMenuNavigation(Menu *menu, Renderer *renderer, SDL_Event *event);
+
+// Function to delete the menu
+void deleteMenu(Menu *menu);
