@@ -90,10 +90,10 @@ void handleMenuNavigation(Menu *menu, Renderer *renderer, SDL_Event *event) {
                         deleteMenu(menu);
 
                         // Création du background
-                        createBackground(renderer, "../include/ressources/images/background/desert/desert1.bmp");
+                        createBackground(renderer, "../include/ressources/images/background/desert/desert1.bmp", 0, 0, WIDTH, HEIGHT);
 
                         // Creation du joueur
-                        createPlayer(renderer, "../include/ressources/images/sprite/mario/mario_normal.bmp");
+                        createPlayer(renderer, "../include/ressources/images/sprite/mario/mario_normal_1.bmp");
 
                         break;
 
