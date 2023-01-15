@@ -12,10 +12,12 @@ struct Player {
 
 void initPlayer(Player *player, Renderer *renderer, const char *imagePath, int pv);
 
-void createBackground(SDL_Renderer *renderer, const char *imagePath);
+void createBackground(SDL_Renderer *renderer, const char *imagePath, int x, int y, int w, int h);
 
 void handlePlayerMovement(Player *player, SDL_Event event, Renderer *renderer);
 
 void createPlayer(SDL_Renderer *renderer, const char *imagePath);
 
 int playerMove(SDL_Renderer *renderer, SDL_Texture *texture, SDL_Rect playerRect, int type);
+
+void playerIsDead(SDL_Renderer *renderer, const char *imagePath);

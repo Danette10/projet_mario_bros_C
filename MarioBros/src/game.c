@@ -7,7 +7,7 @@ void initPlayer(Player *player, SDL_Renderer *renderer, const char *imagePath, i
     SDL_Surface *playerImage = SDL_LoadBMP(imagePath);
 
     // Resize player image
-    SDL_Surface *playerResize = SDL_CreateRGBSurface(0, 50, 50, 32, 0, 0, 0, 0);
+    SDL_Surface *playerResize = SDL_CreateRGBSurface(0, 16, 32, 32, 0, 0, 0, 0);
     SDL_BlitScaled(playerImage, NULL, playerResize, NULL);
 
     // Set green color as transparent
@@ -22,9 +22,9 @@ void initPlayer(Player *player, SDL_Renderer *renderer, const char *imagePath, i
 
     // Initialize player rect
     player->rect.x = 0;
-    player->rect.y = 150;
-    player->rect.w = 50;
-    player->rect.h = 50;
+    player->rect.y = 165;
+    player->rect.w = 16;
+    player->rect.h = 32;
 
     // Initialize player's pv
     player->pv = pv;
@@ -36,9 +36,11 @@ void initPlayer(Player *player, SDL_Renderer *renderer, const char *imagePath, i
     SDL_FreeSurface(playerImage);
 }
 
-void createBackground(SDL_Renderer *renderer, const char *imagePath)
+
+
+void createBackground(SDL_Renderer *renderer, const char *imagePath, int x, int y, int w, int h)
 {
-// On charge l'image du décor
+    // On charge l'image du décor
     SDL_Surface *background = SDL_LoadBMP(imagePath);
 
     // On crée une texture à partir de l'image
@@ -48,15 +50,11 @@ void createBackground(SDL_Renderer *renderer, const char *imagePath)
         return;
     }
 
-    // On crée un rectangle pour positionner le décor à l'écran
-    SDL_Rect backgroundRect;
-    backgroundRect.x = 0;
-    backgroundRect.y = 0;
-    backgroundRect.w = WIDTH;
-    backgroundRect.h = HEIGHT;
+    // On définit une zone de rendu spécifique dans la fenêtre de rendu
+    SDL_RenderSetViewport(renderer, &(SDL_Rect){x, y, w, h});
 
     // On affiche le décor à l'écran
-    SDL_RenderCopy(renderer, texture, NULL, &backgroundRect);
+    SDL_RenderCopy(renderer, texture, NULL, NULL);
     SDL_RenderPresent(renderer);
 
     // On libère la mémoire
@@ -65,8 +63,11 @@ void createBackground(SDL_Renderer *renderer, const char *imagePath)
 }
 
 int playerMove(SDL_Renderer *renderer, SDL_Texture *texture, SDL_Rect playerRect, int type) {
-// On efface le joueur à l'écran
+
+    // On efface le joueur à l'écran
     SDL_RenderClear(renderer);
+
+    SDL_Rect camera = {0, 0, WIDTH, HEIGHT};
 
     switch (type) {
 
@@ -74,10 +75,10 @@ int playerMove(SDL_Renderer *renderer, SDL_Texture *texture, SDL_Rect playerRect
 
             // On déplace le joueur de 10 pixels vers la droite
             playerRect.x += 10;
-            playerRect.y = 150;
+            playerRect.y = 165;
 
-            // On affiche à nouveau le joueur et le décor
-            createBackground(renderer, "../include/ressources/images/background/desert/desert1.bmp");
+            createBackground(renderer, "../include/ressources/images/background/desert/desert1.bmp", camera.x, camera.y, WIDTH, HEIGHT);
+
             SDL_RenderCopy(renderer, texture, NULL, &playerRect);
             SDL_RenderPresent(renderer);
 
@@ -86,9 +87,9 @@ int playerMove(SDL_Renderer *renderer, SDL_Texture *texture, SDL_Rect playerRect
         case 2:
 
             playerRect.x -= 10;
-            playerRect.y = 150;
+            playerRect.y = 165;
 
-            createBackground(renderer, "../include/ressources/images/background/desert/desert1.bmp");
+            createBackground(renderer, "../include/ressources/images/background/desert/desert1.bmp", camera.x, camera.y, WIDTH, HEIGHT);
             // Flip the player
             SDL_RenderCopyEx(renderer, texture, NULL, &playerRect, 0, NULL, SDL_FLIP_HORIZONTAL);
             SDL_RenderPresent(renderer);
@@ -101,7 +102,7 @@ int playerMove(SDL_Renderer *renderer, SDL_Texture *texture, SDL_Rect playerRect
             // Garder sa position en x
             int x = playerRect.x;
 
-            createBackground(renderer, "../include/ressources/images/background/desert/desert1.bmp");
+            createBackground(renderer, "../include/ressources/images/background/desert/desert1.bmp", camera.x, camera.y, WIDTH, HEIGHT);
             SDL_RenderCopy(renderer, texture, NULL, &playerRect);
             SDL_RenderPresent(renderer);
 
@@ -118,6 +119,8 @@ int playerMove(SDL_Renderer *renderer, SDL_Texture *texture, SDL_Rect playerRect
 
     return playerRect.x;
 }
+
+int stateSpace = 0;
 
 void handlePlayerMovement(Player *player, SDL_Event event, SDL_Renderer *renderer)
 {
@@ -138,23 +141,31 @@ void handlePlayerMovement(Player *player, SDL_Event event, SDL_Renderer *rendere
         }
         if(event.key.keysym.sym == SDLK_SPACE) {
 
-            if (player->rect.y == 150) {
+            if (player->rect.y == 165 && stateSpace == 0) {
                 int type = 3;
                 SDL_Delay(150);
-
                 player->rect.y = playerMove(renderer, player->texture, player->rect, type);
+                SDL_Delay(400);
 
-                SDL_Delay(500);
-
+            }else{
+                stateSpace = 1;
             }
 
             // Clear player texture
             SDL_RenderClear(renderer);
-            createBackground(renderer, "../include/ressources/images/background/desert/desert1.bmp");
-            player->rect.y = 150;
+            createBackground(renderer, "../include/ressources/images/background/desert/desert1.bmp", 0, 0, WIDTH, HEIGHT);
+            player->rect.y = 165;
             SDL_RenderCopy(renderer, player->texture, NULL, &player->rect);
             SDL_RenderPresent(renderer);
 
+            SDL_Delay(150);
+            stateSpace = 0;
+
+        }
+
+        if (player->pv == 0){
+            SDL_EventState(SDL_KEYDOWN, SDL_IGNORE);
+            playerIsDead(renderer, "../include/ressources/images/background/Gameover.bmp");
         }
     }
 }
@@ -176,4 +187,26 @@ void createPlayer(SDL_Renderer *renderer, const char *imagePath) {
             handlePlayerMovement(&player, event, renderer);
         }
     }
+}
+
+void playerIsDead(SDL_Renderer *renderer, const char *imagePath) {
+    SDL_Surface *playerImage = SDL_LoadBMP(imagePath);
+    SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, playerImage);
+    if (texture == NULL) {
+        printf("Could not create texture: %s\n", SDL_GetError());
+        return;
+    }
+
+    // On supprime background et player
+    SDL_RenderClear(renderer);
+
+    // On affiche le Gameover
+    SDL_RenderCopy(renderer, texture, NULL, NULL);
+    SDL_RenderPresent(renderer);
+
+    // On libère la mémoire
+    SDL_DestroyTexture(texture);
+    SDL_FreeSurface(playerImage);
+
+
 }

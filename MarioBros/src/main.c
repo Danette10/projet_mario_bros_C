@@ -38,6 +38,8 @@ int main(int argc, char *argv[]) {
     SDL_AudioDeviceID deviceId = SDL_OpenAudioDevice(NULL, 0, &wavSpec, NULL, 0);
     SDL_PauseAudioDevice(deviceId, 0);
 
+    SDL_Delay(100);
+
     Menu menu;
 
     initMenu(&menu, 4);
@@ -65,7 +67,6 @@ int main(int argc, char *argv[]) {
                 return 0;
 
             }
-
             handleMenuNavigation(&menu, renderer, &event);
 
         }
