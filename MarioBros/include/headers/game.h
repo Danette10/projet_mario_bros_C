@@ -1,4 +1,5 @@
 #include <SDL_video.h>
+#include <stdbool.h>
 #include "define.h"
 
 typedef struct Player Player;
@@ -10,14 +11,23 @@ struct Player {
     int pv;
 };
 
+// Structure pour stocker les informations de l'ennemi
+typedef struct {
+    SDL_Texture *texture;
+    SDL_Rect rect;
+    int x_velocity;
+} Enemy;
+
 void initPlayer(Player *player, Renderer *renderer, const char *imagePath, int pv);
 
 void createBackground(SDL_Renderer *renderer, const char *imagePath, int x, int y, int w, int h);
 
-void handlePlayerMovement(Player *player, SDL_Event event, Renderer *renderer);
+void handlePlayerMovement(Player *player, SDL_Event event, Renderer *renderer, Enemy *enemy);
 
-void createPlayer(SDL_Renderer *renderer, const char *imagePath);
-
-int playerMove(SDL_Renderer *renderer, SDL_Texture *texture, SDL_Rect playerRect, int type);
+void loopGame(SDL_Renderer *renderer);
 
 void playerIsDead(SDL_Renderer *renderer, const char *imagePath);
+
+void createEnemy(Enemy *enemy, SDL_Renderer *renderer, const char *imagePath);
+
+void moveEnemy(Enemy *enemy, SDL_Renderer *renderer, Player *player);
