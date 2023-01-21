@@ -31,3 +31,5 @@ void playerIsDead(SDL_Renderer *renderer, const char *imagePath);
 void createEnemy(Enemy *enemy, SDL_Renderer *renderer, const char *imagePath);
 
 void moveEnemy(Enemy *enemy, SDL_Renderer *renderer, Player *player);
+
+void enemyDeath(Enemy *enemy, SDL_Renderer *renderer, Player *player);
