@@ -128,6 +128,31 @@ void createBackground(SDL_Renderer *renderer, const char *imagePath, int x, int 
     SDL_FreeSurface(background);
 }
 
+void enemyDeath(Enemy *enemy, SDL_Renderer *renderer, Player *player) {
+    SDL_RenderClear(renderer);
+
+    // Create background
+    createBackground(renderer, "../include/ressources/images/background/desert/desert1.bmp", 0, 0 , WIDTH, HEIGHT);
+
+    // Remplacer l'ennemi par un cadavre
+    SDL_Surface *enemyImage = SDL_LoadBMP("../include/ressources/images/sprite/goomba/goomba_dead.bmp");
+    SDL_Surface *enemyResize = SDL_CreateRGBSurface(0, 16, 16, 32, 0, 0, 0, 0);
+    SDL_BlitScaled(enemyImage, NULL, enemyResize, NULL);
+    SDL_SetColorKey(enemyResize, SDL_TRUE, SDL_MapRGB(enemyResize->format, 0, 255, 0));
+    enemy->texture = SDL_CreateTextureFromSurface(renderer, enemyResize);
+    if (enemy->texture == NULL) {
+        printf("Could not create texture: %s \n", SDL_GetError());
+        return;
+    }
+
+    SDL_RenderCopy(renderer, enemy->texture, NULL, &enemy->rect);
+
+    SDL_RenderCopy(renderer, player->texture, NULL, &player->rect);
+    SDL_RenderPresent(renderer);
+
+    SDL_Delay(1000);
+}
+
 bool keys[SDL_NUM_SCANCODES];
 bool isJumping = false;
 bool isMovingRight = false;
@@ -182,9 +207,25 @@ void handlePlayerMovement(Player *player, SDL_Event event, SDL_Renderer *rendere
         }
     }
 
-    if (player->pv == 0) {
-        SDL_EventState(SDL_KEYDOWN, SDL_IGNORE);
-        playerIsDead(renderer, "../include/ressources/images/background/Gameover.bmp");
+    if (isJumping && player->rect.y < enemy->rect.y + enemy->rect.h && player->rect.y + player->rect.h > enemy->rect.y && player->rect.x < enemy->rect.x + enemy->rect.w && player->rect.x + player->rect.w > enemy->rect.x) {
+        enemyDeath(enemy, renderer, player);
+
+        enemy->rect.x = 0;
+        enemy->rect.y = 0;
+        enemy->rect.w = 0;
+        enemy->rect.h = 0;
+
+        SDL_DestroyTexture(enemy->texture);
+    }else{
+        // Si le joueur ne saute pas, et qu'il est en collision avec l'ennemi, il perd une vie
+        if (player->rect.y == 165 && player->rect.y < enemy->rect.y + enemy->rect.h && player->rect.y + player->rect.h > enemy->rect.y && player->rect.x < enemy->rect.x + enemy->rect.w && player->rect.x + player->rect.w > enemy->rect.x) {
+            if(player->pv > 0){
+                player->pv -= 50;
+            }else{
+                player->pv = 0;
+                return;
+            }
+        }
     }
 
     // clear the renderer
@@ -207,11 +248,12 @@ void handlePlayerMovement(Player *player, SDL_Event event, SDL_Renderer *rendere
     }
 }
 
+int pv = 100;
 
 void loopGame(SDL_Renderer *renderer) {
 
     Player player;
-    initPlayer(&player, renderer, "../include/ressources/images/sprite/mario/mario_normal_1.bmp", 100);
+    initPlayer(&player, renderer, "../include/ressources/images/sprite/mario/mario_normal_1.bmp", pv);
 
     Enemy enemy;
     createEnemy(&enemy, renderer, "../include/ressources/images/sprite/goomba/goomba_1.bmp");
@@ -230,7 +272,19 @@ void loopGame(SDL_Renderer *renderer) {
                 return;
             }
 
-            handlePlayerMovement(&player, event, renderer, &enemy);
+            // Si le joueur n'a plus de vie, on ouvre la fonction de game over
+            if(player.pv == 0){
+
+                // Supprimer le joueur
+                SDL_DestroyTexture(player.texture);
+
+                // Supprimer l'ennemi
+                SDL_DestroyTexture(enemy.texture);
+
+                playerIsDead(renderer, "../include/ressources/images/background/Gameover.bmp");
+            }else{
+                handlePlayerMovement(&player, event, renderer, &enemy);
+            }
         }
 
         // Déplacement de l'ennemi
@@ -247,16 +301,24 @@ void playerIsDead(SDL_Renderer *renderer, const char *imagePath) {
         return;
     }
 
-    // On supprime background et player
+    // Supprimer tout ce qui est affiché
     SDL_RenderClear(renderer);
 
-    // On affiche le Gameover
+    // Afficher l'image de Game Over
     SDL_RenderCopy(renderer, texture, NULL, NULL);
+
+    // Mettre à jour l'affichage
     SDL_RenderPresent(renderer);
 
-    // On libère la mémoire
-    SDL_DestroyTexture(texture);
-    SDL_FreeSurface(playerImage);
-
+    // on reste dans cette boucle tant que l'utilisateur n'a pas appuyé sur echap
+    SDL_Event event;
+    while (1) {
+        while (SDL_PollEvent(&event)) {
+            if (event.type == SDL_QUIT || (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_ESCAPE)) {
+                exit(0);
+                return;
+            }
+        }
+    }
 
 }
