@@ -93,7 +93,34 @@ void moveEnemy(Enemy *enemy, SDL_Renderer *renderer, Player *player) {
     // Create background
     createBackground(renderer, "../include/ressources/images/background/desert/desert1.bmp", 0, 0 , WIDTH, HEIGHT);
 
+    // Create player
+    SDL_RenderCopy(renderer, player->texture, NULL, &player->rect);
     SDL_RenderCopy(renderer, enemy->texture, NULL, &enemy->rect);
+    SDL_RenderCopy(renderer, player->texture, NULL, &player->rect);
+    SDL_SetRenderTarget(renderer, NULL);
+
+    // Code mamadou
+    //Création d'un carré noir à 200 pixel de la gauche et 200 pixel du haut
+    SDL_Rect madmadroom = {200, 100, 100, 100};
+    //Création d'une texture noir
+    SDL_Texture *madmadtexture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, 100, 100);
+
+    //On dessine le carré noir dans la texture
+
+    SDL_SetRenderTarget(renderer, madmadtexture);
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+    SDL_RenderFillRect(renderer, &madmadroom);
+    SDL_SetRenderTarget(renderer, NULL);
+
+    // Si position du joueur est supérieur à 200, le joueur ne peut pas aller plus loin
+    if (player->rect.x >= 200) {
+        player->rect.x = 180;
+    }
+
+    // Afficher le carré noir à l'écran
+    SDL_RenderCopy(renderer, madmadtexture, NULL, &madmadroom);
+
+    // Code mamadou
 
     SDL_RenderCopy(renderer, player->texture, NULL, &player->rect);
     SDL_RenderPresent(renderer);
@@ -260,7 +287,6 @@ void loopGame(SDL_Renderer *renderer) {
 
     createBackground(renderer, "../include/ressources/images/background/desert/desert1.bmp", 0, 0, WIDTH, HEIGHT);
 
-
     SDL_Event event;
 
     while (1) {
@@ -322,3 +348,4 @@ void playerIsDead(SDL_Renderer *renderer, const char *imagePath) {
     }
 
 }
+
