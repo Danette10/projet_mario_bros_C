@@ -1,4 +1,5 @@
 #include <SDL.h>
+#include <SDL_audio.h>
 #include "../include/headers/game.h"
 
 void initPlayer(Player *player, SDL_Renderer *renderer, const char *imagePath, int pv)
@@ -202,8 +203,16 @@ void handlePlayerMovement(Player *player, SDL_Event event, SDL_Renderer *rendere
             }
         }
         if (event.key.keysym.sym == SDLK_SPACE) {
+            SDL_AudioSpec wavSpec;
+            Uint32 wavLength;
+            Uint8 *wavBuffer;
+            SDL_LoadWAV("../include/ressources/sounds/effects/jump.wav", &wavSpec, &wavBuffer, &wavLength);
+            SDL_AudioDeviceID deviceId = SDL_OpenAudioDevice(NULL, 0, &wavSpec, NULL, 0);
+            SDL_PauseAudioDevice(deviceId, 0);
+            SDL_QueueAudio(deviceId, wavBuffer, wavLength);
             keys[SDL_SCANCODE_SPACE] = true;
             if (player->rect.y == 165 && !isJumping) {
+
                 player->rect.y -= 30;
             }
             isJumping = true;
@@ -262,6 +271,7 @@ void handlePlayerMovement(Player *player, SDL_Event event, SDL_Renderer *rendere
     moveEnemy(enemy, renderer, player);
 
     // render the player's texture
+    SDL_Delay(10);
     SDL_RenderCopy(renderer, player->texture, NULL, &player->rect);
 
     // Si le joueur n'est pas sur le sol, il tombe
@@ -335,6 +345,34 @@ void playerIsDead(SDL_Renderer *renderer, const char *imagePath) {
 
     // Mettre à jour l'affichage
     SDL_RenderPresent(renderer);
+
+    // Jouer une musique
+    SDL_AudioSpec wavSpec;
+    Uint32 wavLength;
+    Uint8 *wavBuffer;
+    SDL_LoadWAV("../include/ressources/sounds/music/gameover.wav", &wavSpec, &wavBuffer, &wavLength);
+
+    // Avant de jouer la musique, on ferme tous les autres canaux
+    SDL_CloseAudioDevice(1);
+    SDL_CloseAudioDevice(2);
+    SDL_CloseAudioDevice(3);
+    SDL_CloseAudioDevice(4);
+
+    // Ouvrir un canal audio
+    SDL_AudioDeviceID deviceId = SDL_OpenAudioDevice(NULL, 0, &wavSpec, NULL, 0);
+    if (deviceId == 0) {
+        printf("Failed to open audio: %s \n", SDL_GetError());
+        return;
+    }
+
+    // Jouer la musique
+    SDL_QueueAudio(deviceId, wavBuffer, wavLength);
+    SDL_PauseAudioDevice(deviceId, 0);
+
+    while (SDL_GetQueuedAudioSize(deviceId) > 0) {
+        SDL_Delay(100);
+    }
+
 
     // on reste dans cette boucle tant que l'utilisateur n'a pas appuyé sur echap
     SDL_Event event;
