@@ -28,14 +28,6 @@ void playMusic(char *musicPath, int type) {
 
 }
 
-// je veux une fonction qui récupère seulement la position en x du joueur
-int playerPositionX(SDL_Renderer *renderer, SDL_Texture *texture, SDL_Rect playerRect) {
-
-    int x = playerRect.x;
-
-    return x;
-}
-
 void moveEnemy(Enemy *enemy, SDL_Renderer *renderer, Player *player) {
 
     SDL_RenderClear(renderer);
@@ -85,9 +77,6 @@ void moveEnemy(Enemy *enemy, SDL_Renderer *renderer, Player *player) {
 
 }
 
-
-
-void createBackground(SDL_Renderer *renderer, const char *imagePath, int x, int y, int w, int h)
 // Function to create background
 void createBackground(SDL_Renderer *renderer, char *imagePath, int x, int y, int w, int h)
 {
@@ -326,29 +315,6 @@ void createEnemy(Enemy *enemy, SDL_Renderer *renderer, char *name, char *imagePa
 
     // Libérer la mémoire
     SDL_FreeSurface(enemyImage);
-}
-
-// Function to move the enemy
-void moveEnemy(Enemy *enemy, SDL_Renderer *renderer, Player *player) {
-
-    SDL_RenderClear(renderer);
-
-    if (enemy->rect.x >= 300 && enemy->rect.x <= 400) {
-        enemy->rect.x += enemy->x_velocity;
-    } else {
-        enemy->x_velocity = -enemy->x_velocity;
-        enemy->rect.x += enemy->x_velocity;
-    }
-    // Create background
-    createBackground(renderer, "../include/ressources/images/background/desert/desert1.bmp", 0, 0 , WIDTH, HEIGHT);
-
-    SDL_RenderCopy(renderer, enemy->texture, NULL, &enemy->rect);
-
-    SDL_RenderCopy(renderer, player->texture, NULL, &player->rect);
-    SDL_RenderPresent(renderer);
-
-    SDL_Delay(100);
-
 }
 
 // Function to check if the enemy is dead
