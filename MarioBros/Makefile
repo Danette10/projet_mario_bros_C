@@ -4,7 +4,7 @@ SRC = $(wildcard src/*.c)
 OBJ = $(SRC:.c=.o)
 CFLAGS = -Wall `sdl2-config --cflags --libs`
 
-all: $(EXEC) clean
+all: $(EXEC)
 
 %.o: %.c
 	$(CC) -o $@ -c $< $(CFLAGS)

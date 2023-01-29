@@ -28,6 +28,42 @@ void playMusic(char *musicPath, int type) {
 
 }
 
+// Function to check collision
+bool checkCollision(SDL_Rect a, SDL_Rect b) {
+    int leftA, leftB;
+    int rightA, rightB;
+    int topA, topB;
+    int bottomA, bottomB;
+
+    leftA = a.x;
+    rightA = a.x + a.w;
+    topA = a.y;
+    bottomA = a.y + a.h;
+
+    leftB = b.x;
+    rightB = b.x + b.w;
+    topB = b.y;
+    bottomB = b.y + b.h;
+
+    if (bottomA <= topB) {
+        return false;
+    }
+
+    if (topA >= bottomB) {
+        return false;
+    }
+
+    if (rightA <= leftB) {
+        return false;
+    }
+
+    if (leftA >= rightB) {
+        return false;
+    }
+
+    return true;
+}
+
 // Function to create background
 void createBackground(SDL_Renderer *renderer, char *imagePath, int x, int y, int w, int h)
 {
@@ -147,8 +183,8 @@ void handlePlayerMovement(Player *player, SDL_Event event, SDL_Renderer *rendere
             keys[SDL_SCANCODE_SPACE] = false;
         }
     }
-
-    if (isJumping && player->rect.y < enemy->rect.y + enemy->rect.h && player->rect.y + player->rect.h > enemy->rect.y && player->rect.x < enemy->rect.x + enemy->rect.w && player->rect.x + player->rect.w > enemy->rect.x) {
+    
+    if (isJumping && checkCollision(player->rect, enemy->rect)) {
         enemyDeath(enemy, renderer, player, object);
 
         enemy->rect.x = 0;
@@ -159,7 +195,7 @@ void handlePlayerMovement(Player *player, SDL_Event event, SDL_Renderer *rendere
         SDL_DestroyTexture(enemy->texture);
     }else{
 
-        if (player->rect.y == 165 && player->rect.y < enemy->rect.y + enemy->rect.h && player->rect.y + player->rect.h > enemy->rect.y && player->rect.x < enemy->rect.x + enemy->rect.w && player->rect.x + player->rect.w > enemy->rect.x) {
+        if (player->rect.y == 165 && checkCollision(player->rect, enemy->rect)) {
             if(player->pv > 0){
                 player->pv -= 50;
             }else{
