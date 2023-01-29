@@ -45,10 +45,10 @@ void enemyDeath(Enemy *enemy, SDL_Renderer *renderer, Player *player, Object *ob
 
 // Object functions
 void createObject(Object *object, SDL_Renderer *renderer, int x, int y, char *name, char *imagePath);
-void handleObjectCollision(Object *object, SDL_Renderer *renderer, Player *player);
 
 // Game functions
 void loopGame(SDL_Renderer *renderer);
+bool checkCollision(SDL_Rect a, SDL_Rect b);
 
 // Utility functions
 void playMusic(char *musicPath, int type);
