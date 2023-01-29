@@ -22,16 +22,30 @@ typedef struct {
     int x_velocity;
 } Enemy;
 
+// Structure for the objects
+typedef struct {
+    char *name;
+    char *imagePath;
+    SDL_Texture *texture;
+    SDL_Rect rect;
+    int x_velocity;
+    bool isColliding;
+} Object;
+
 // Player functions
 void initPlayer(Player *player, Renderer *renderer, char *name, char *imagePath);
 void createBackground(SDL_Renderer *renderer, char *imagePath, int x, int y, int w, int h);
-void handlePlayerMovement(Player *player, SDL_Event event, Renderer *renderer, Enemy *enemy);
+void handlePlayerMovement(Player *player, SDL_Event event, Renderer *renderer, Enemy *enemy, Object *object);
 void playerIsDead(SDL_Renderer *renderer, char *imagePath);
 
 // Enemy functions
 void createEnemy(Enemy *enemy, SDL_Renderer *renderer, char *name, char *imagePath);
-void moveEnemy(Enemy *enemy, SDL_Renderer *renderer, Player *player);
-void enemyDeath(Enemy *enemy, SDL_Renderer *renderer, Player *player);
+void moveEnemy(Enemy *enemy, SDL_Renderer *renderer, Player *player, Object *object);
+void enemyDeath(Enemy *enemy, SDL_Renderer *renderer, Player *player, Object *object);
+
+// Object functions
+void createObject(Object *object, SDL_Renderer *renderer, int x, int y, char *name, char *imagePath);
+void handleObjectCollision(Object *object, SDL_Renderer *renderer, Player *player);
 
 // Game functions
 void loopGame(SDL_Renderer *renderer);
