@@ -1,14 +1,15 @@
 #include <SDL_video.h>
 #include "define.h"
 
-typedef struct Menu Menu;
 typedef SDL_Renderer Renderer;
 
-struct Menu {
+typedef struct Menu {
+
     char **options; // array of BMP file paths for the options
     int optionCount; // number of options in the menu
     int currentIndex; // index of the currently selected option
-};
+
+} Menu;
 
 // Initialize a new menu with a given number of options
 void initMenu(Menu *menu, int optionCount);
