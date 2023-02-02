@@ -1,32 +1,7 @@
 #include <SDL.h>
 #include <SDL_audio.h>
 #include "../include/headers/game.h"
-
-// Function to play music
-void playMusic(char *musicPath, int type) {
-
-    SDL_AudioSpec wavSpec;
-    Uint32 wavLength;
-    Uint8 *wavBuffer;
-    SDL_LoadWAV(musicPath, &wavSpec, &wavBuffer, &wavLength);
-
-    SDL_AudioDeviceID deviceId = SDL_OpenAudioDevice(NULL, 0, &wavSpec, NULL, 0);
-    if (deviceId == 0) {
-        printf("Failed to open audio: %s \n", SDL_GetError());
-        return;
-    }
-
-    // Jouer la musique
-    SDL_QueueAudio(deviceId, wavBuffer, wavLength);
-    SDL_PauseAudioDevice(deviceId, 0);
-
-    if(type == 1){
-        while (SDL_GetQueuedAudioSize(deviceId) > 0) {
-            SDL_Delay(100);
-        }
-    }
-
-}
+#include "../include/headers/utilities.h"
 
 // Function to check collision
 bool checkCollision(SDL_Rect a, SDL_Rect b) {
@@ -235,6 +210,11 @@ void playerIsDead(SDL_Renderer *renderer, char *imagePath) {
         return;
     }
 
+    // Augmenter le nombre de morts$
+    int deaths = readTextFile("../include/ressources/scores/deaths.txt");
+    deaths++;
+    writeTextFile(deaths, "../include/ressources/scores/deaths.txt");
+
     // Supprimer tout ce qui est affiché
     SDL_RenderClear(renderer);
 
@@ -248,18 +228,15 @@ void playerIsDead(SDL_Renderer *renderer, char *imagePath) {
 
     playMusic("../include/ressources/sounds/music/gameover.wav", 1);
 
-
-    // on reste dans cette boucle tant que l'utilisateur n'a pas appuyé sur echap
     SDL_Event event;
     while (1) {
         while (SDL_PollEvent(&event)) {
             if (event.type == SDL_QUIT || (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_ESCAPE)) {
+                SDL_Quit();
                 exit(0);
-                return;
             }
         }
     }
-
 }
 
 // Function to create an enemy
@@ -426,7 +403,6 @@ void loopGame(SDL_Renderer *renderer) {
                 // On libère la mémoire avant de quitter
                 SDL_DestroyTexture(player.texture);
                 exit(0);
-                return;
             }
 
             // Si le joueur n'a plus de vie, on ouvre la fonction de game over

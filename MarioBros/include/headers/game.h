@@ -33,21 +33,18 @@ typedef struct {
 
 // Player functions
 void initPlayer(Player *player, Renderer *renderer, char *name, char *imagePath);
-void createBackground(SDL_Renderer *renderer, char *imagePath, int x, int y, int w, int h);
+void createBackground(Renderer *renderer, char *imagePath, int x, int y, int w, int h);
 void handlePlayerMovement(Player *player, SDL_Event event, Renderer *renderer, Enemy *enemy, Object *object);
-void playerIsDead(SDL_Renderer *renderer, char *imagePath);
+void playerIsDead(Renderer *renderer, char *imagePath);
 
 // Enemy functions
-void createEnemy(Enemy *enemy, SDL_Renderer *renderer, char *name, char *imagePath);
-void moveEnemy(Enemy *enemy, SDL_Renderer *renderer, Player *player, Object *object);
-void enemyDeath(Enemy *enemy, SDL_Renderer *renderer, Player *player, Object *object);
+void createEnemy(Enemy *enemy, Renderer *renderer, char *name, char *imagePath);
+void moveEnemy(Enemy *enemy, Renderer *renderer, Player *player, Object *object);
+void enemyDeath(Enemy *enemy, Renderer *renderer, Player *player, Object *object);
 
 // Object functions
-void createObject(Object *object, SDL_Renderer *renderer, int x, int y, char *name, char *imagePath);
+void createObject(Object *object, Renderer *renderer, int x, int y, char *name, char *imagePath);
 
 // Game functions
-void loopGame(SDL_Renderer *renderer);
+void loopGame(Renderer *renderer);
 bool checkCollision(SDL_Rect a, SDL_Rect b);
-
-// Utility functions
-void playMusic(char *musicPath, int type);
