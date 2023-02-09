@@ -108,7 +108,7 @@ bool isMovingRight = false;
 // Function to handle player movement
 void handlePlayerMovement(Player *player, SDL_Event event, SDL_Renderer *renderer, Enemy *enemy, Object *object, Background *background) {
     // check for key press events
-    if (event.type == SDL_KEYDOWN) {
+    if (event.type == SDL_KEYUP) {
 
         if (event.key.keysym.sym == SDLK_RIGHT) {
             keys[SDL_SCANCODE_RIGHT] = true;
@@ -136,13 +136,13 @@ void handlePlayerMovement(Player *player, SDL_Event event, SDL_Renderer *rendere
             // Déplacement du background pour sauter
             if (background->rect.y > -HEIGHT) {
                 background->rect.y += 10;
+                object->rect.y += 10;
+                SDL_RenderCopy(renderer, object->texture, NULL, &object->rect);
+                enemy->rect.y += 10;
+                SDL_RenderCopy(renderer, enemy->texture, NULL, &enemy->rect);
             }
             isJumping = true;
 
-            if (background->rect.y < 0) {
-                background->rect.y -= 10;
-            }
-            isJumping = false;
         }
 
     }
@@ -190,6 +190,16 @@ void handlePlayerMovement(Player *player, SDL_Event event, SDL_Renderer *rendere
     // render the player's texture
     SDL_Delay(10);
     SDL_RenderCopy(renderer, player->texture, NULL, &player->rect);
+
+    // Attendre 10ms et faire tomber le joueur et redepacer le background
+    SDL_Delay(10);
+    if (background->rect.y > 0) {
+        background->rect.y -= 10;
+        object->rect.y -= 10;
+        SDL_RenderCopy(renderer, object->texture, NULL, &object->rect);
+        enemy->rect.y -= 10;
+        SDL_RenderCopy(renderer, enemy->texture, NULL, &enemy->rect);
+    }
 
     // Si le joueur est en train de sauter, il ne peux pas cliquer sur la touche espace
     if (isJumping) {
