@@ -1,80 +1,42 @@
 #include <SDL.h>
 #include <SDL_audio.h>
 #include "../include/headers/game.h"
+#include "../include/headers/utilities.h"
 
-// Function to play music
-void playMusic(char *musicPath, int type) {
+// Function to check collision
+bool checkCollision(SDL_Rect a, SDL_Rect b) {
+    int leftA, leftB;
+    int rightA, rightB;
+    int topA, topB;
+    int bottomA, bottomB;
 
-    SDL_AudioSpec wavSpec;
-    Uint32 wavLength;
-    Uint8 *wavBuffer;
-    SDL_LoadWAV(musicPath, &wavSpec, &wavBuffer, &wavLength);
+    leftA = a.x;
+    rightA = a.x + a.w;
+    topA = a.y;
+    bottomA = a.y + a.h;
 
-    SDL_AudioDeviceID deviceId = SDL_OpenAudioDevice(NULL, 0, &wavSpec, NULL, 0);
-    if (deviceId == 0) {
-        printf("Failed to open audio: %s \n", SDL_GetError());
-        return;
+    leftB = b.x;
+    rightB = b.x + b.w;
+    topB = b.y;
+    bottomB = b.y + b.h;
+
+    if (bottomA <= topB) {
+        return false;
     }
 
-    // Jouer la musique
-    SDL_QueueAudio(deviceId, wavBuffer, wavLength);
-    SDL_PauseAudioDevice(deviceId, 0);
-
-    if(type == 1){
-        while (SDL_GetQueuedAudioSize(deviceId) > 0) {
-            SDL_Delay(100);
-        }
+    if (topA >= bottomB) {
+        return false;
     }
 
-}
-
-void moveEnemy(Enemy *enemy, SDL_Renderer *renderer, Player *player) {
-
-    SDL_RenderClear(renderer);
-
-    if (enemy->rect.x >= 300 && enemy->rect.x <= 400) {
-        enemy->rect.x += enemy->x_velocity;
-    } else {
-        enemy->x_velocity = -enemy->x_velocity;
-        enemy->rect.x += enemy->x_velocity;
-    }
-    // Create background
-    createBackground(renderer, "../include/ressources/images/background/desert/desert1.bmp", 0, 0 , WIDTH, HEIGHT);
-
-    // Create player
-    SDL_RenderCopy(renderer, player->texture, NULL, &player->rect);
-    SDL_RenderCopy(renderer, enemy->texture, NULL, &enemy->rect);
-    SDL_RenderCopy(renderer, player->texture, NULL, &player->rect);
-    SDL_SetRenderTarget(renderer, NULL);
-
-    // Code mamadou
-    //Création d'un carré noir à 200 pixel de la gauche et 200 pixel du haut
-    SDL_Rect madmadroom = {200, 100, 100, 100};
-    //Création d'une texture noir
-    SDL_Texture *madmadtexture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, 100, 100);
-
-    //On dessine le carré noir dans la texture
-
-    SDL_SetRenderTarget(renderer, madmadtexture);
-    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-    SDL_RenderFillRect(renderer, &madmadroom);
-    SDL_SetRenderTarget(renderer, NULL);
-
-    // Si position du joueur est supérieur à 200, le joueur ne peut pas aller plus loin
-    if (player->rect.x >= 200) {
-        player->rect.x = 180;
+    if (rightA <= leftB) {
+        return false;
     }
 
-    // Afficher le carré noir à l'écran
-    SDL_RenderCopy(renderer, madmadtexture, NULL, &madmadroom);
+    if (leftA >= rightB) {
+        return false;
+    }
 
-    // Code mamadou
-
-    SDL_RenderCopy(renderer, player->texture, NULL, &player->rect);
-    SDL_RenderPresent(renderer);
-
-    SDL_Delay(100);
-
+    return true;
 }
 
 // Function to create background
@@ -147,7 +109,7 @@ bool isJumping = false;
 bool isMovingRight = false;
 
 // Function to handle player movement
-void handlePlayerMovement(Player *player, SDL_Event event, SDL_Renderer *renderer, Enemy *enemy) {
+void handlePlayerMovement(Player *player, SDL_Event event, SDL_Renderer *renderer, Enemy *enemy, Object *object) {
     // check for key press events
     if (event.type == SDL_KEYDOWN) {
 
@@ -197,8 +159,8 @@ void handlePlayerMovement(Player *player, SDL_Event event, SDL_Renderer *rendere
         }
     }
 
-    if (isJumping && player->rect.y < enemy->rect.y + enemy->rect.h && player->rect.y + player->rect.h > enemy->rect.y && player->rect.x < enemy->rect.x + enemy->rect.w && player->rect.x + player->rect.w > enemy->rect.x) {
-        enemyDeath(enemy, renderer, player);
+    if (isJumping && checkCollision(player->rect, enemy->rect)) {
+        enemyDeath(enemy, renderer, player, object);
 
         enemy->rect.x = 0;
         enemy->rect.y = 0;
@@ -208,7 +170,7 @@ void handlePlayerMovement(Player *player, SDL_Event event, SDL_Renderer *rendere
         SDL_DestroyTexture(enemy->texture);
     }else{
 
-        if (player->rect.y == 165 && player->rect.y < enemy->rect.y + enemy->rect.h && player->rect.y + player->rect.h > enemy->rect.y && player->rect.x < enemy->rect.x + enemy->rect.w && player->rect.x + player->rect.w > enemy->rect.x) {
+        if (player->rect.y == 165 && checkCollision(player->rect, enemy->rect)) {
             if(player->pv > 0){
                 player->pv -= 50;
             }else{
@@ -222,7 +184,7 @@ void handlePlayerMovement(Player *player, SDL_Event event, SDL_Renderer *rendere
     SDL_RenderClear(renderer);
 
     // move the enemy
-    moveEnemy(enemy, renderer, player);
+    moveEnemy(enemy, renderer, player, object);
 
     // render the player's texture
     SDL_Delay(10);
@@ -248,6 +210,11 @@ void playerIsDead(SDL_Renderer *renderer, char *imagePath) {
         return;
     }
 
+    // Augmenter le nombre de morts$
+    int deaths = readTextFile("../include/ressources/scores/deaths.txt");
+    deaths++;
+    writeTextFile(deaths, "../include/ressources/scores/deaths.txt");
+
     // Supprimer tout ce qui est affiché
     SDL_RenderClear(renderer);
 
@@ -261,18 +228,15 @@ void playerIsDead(SDL_Renderer *renderer, char *imagePath) {
 
     playMusic("../include/ressources/sounds/music/gameover.wav", 1);
 
-
-    // on reste dans cette boucle tant que l'utilisateur n'a pas appuyé sur echap
     SDL_Event event;
     while (1) {
         while (SDL_PollEvent(&event)) {
             if (event.type == SDL_QUIT || (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_ESCAPE)) {
+                SDL_Quit();
                 exit(0);
-                return;
             }
         }
     }
-
 }
 
 // Function to create an enemy
@@ -317,8 +281,36 @@ void createEnemy(Enemy *enemy, SDL_Renderer *renderer, char *name, char *imagePa
     SDL_FreeSurface(enemyImage);
 }
 
+// Function to move the enemy
+void moveEnemy(Enemy *enemy, SDL_Renderer *renderer, Player *player, Object *object) {
+
+    SDL_RenderClear(renderer);
+
+    if (enemy->rect.x >= 300 && enemy->rect.x <= 400) {
+        enemy->rect.x += enemy->x_velocity;
+    } else {
+        enemy->x_velocity = -enemy->x_velocity;
+        enemy->rect.x += enemy->x_velocity;
+    }
+    // Create background
+    createBackground(renderer, "../include/ressources/images/background/desert/desert1.bmp", 0, 0 , WIDTH, HEIGHT);
+
+    SDL_RenderCopy(renderer, enemy->texture, NULL, &enemy->rect);
+
+    SDL_RenderCopy(renderer, player->texture, NULL, &player->rect);
+
+    // Afficher l'objet à l'écran
+    SDL_RenderCopy(renderer, object->texture, NULL, &object->rect);
+
+
+    SDL_RenderPresent(renderer);
+
+    SDL_Delay(100);
+
+}
+
 // Function to check if the enemy is dead
-void enemyDeath(Enemy *enemy, SDL_Renderer *renderer, Player *player) {
+void enemyDeath(Enemy *enemy, SDL_Renderer *renderer, Player *player, Object *object) {
     SDL_RenderClear(renderer);
 
     // Create background
@@ -338,11 +330,70 @@ void enemyDeath(Enemy *enemy, SDL_Renderer *renderer, Player *player) {
     SDL_RenderCopy(renderer, enemy->texture, NULL, &enemy->rect);
 
     SDL_RenderCopy(renderer, player->texture, NULL, &player->rect);
+
+    SDL_RenderCopy(renderer, object->texture, NULL, &object->rect);
+
     SDL_RenderPresent(renderer);
 
     SDL_Delay(1000);
 }
 
+// Function to create a new object
+void createObject(Object *object, SDL_Renderer *renderer, int x, int y, char *name, char *imagePath) {
+
+    // Initialiser le nom de l'objet
+    object->name = name;
+
+    object->imagePath = imagePath;
+    // Charger l'image de l'objet
+    SDL_Surface *objectImage = SDL_LoadBMP(object->imagePath);
+
+    // Redimensionner l'image de l'objet
+    SDL_Surface *objectResize = SDL_CreateRGBSurface(0, 16, 16, 32, 0, 0, 0, 0);
+
+    SDL_BlitScaled(objectImage, NULL, objectResize, NULL);
+
+    // Rendre le vert transparent
+    SDL_SetColorKey(objectResize, SDL_TRUE, SDL_MapRGB(objectResize->format, 0, 255, 0));
+
+    // Créer une texture à partir de l'image
+    object->texture = SDL_CreateTextureFromSurface(renderer, objectResize);
+    if (object->texture == NULL) {
+        printf("Could not create texture: %s\n", SDL_GetError());
+        return;
+    }
+
+    // Initialiser le rectangle de l'objet
+    object->rect.x = x;
+    object->rect.y = y;
+    object->rect.w = objectImage->w;
+    object->rect.h = objectImage->h;
+
+    // Initialiser la vitesse de déplacement de l'objet
+    object->x_velocity = 5;
+
+    // Afficher l'objet à l'écran
+    SDL_RenderCopy(renderer, object->texture, NULL, &object->rect);
+    SDL_RenderPresent(renderer);
+
+    // Libérer la mémoire
+    SDL_FreeSurface(objectImage);
+}
+// fonction qui permet de deplacer le paysage
+
+//fonction qui permet de deplacer le paysage
+void moveBackground(SDL_Renderer *renderer, int x, int y, int w, int h, int x_velocity) {
+    SDL_Rect rect;
+    rect.x = x;
+    rect.y = y;
+    rect.w = w;
+    rect.h = h;
+
+    SDL_RenderCopy(renderer, background, NULL, &rect);
+    SDL_RenderPresent(renderer);
+
+    SDL_Delay(100);
+}
 
 // Game loop
 void loopGame(SDL_Renderer *renderer) {
@@ -353,8 +404,10 @@ void loopGame(SDL_Renderer *renderer) {
     Enemy enemy;
     createEnemy(&enemy, renderer, "Goomba", "../include/ressources/images/sprite/goomba/goomba_1.bmp");
 
-    createBackground(renderer, "../include/ressources/images/background/desert/desert1.bmp", 0, 0, WIDTH, HEIGHT);
+    Object object;
+    createObject(&object, renderer, 700, 180,"PowerUp", "../include/ressources/images/sprite/items/power_up.bmp");
 
+    createBackground(renderer, "../include/ressources/images/background/desert/desert1.bmp", 0, 0, WIDTH, HEIGHT);
 
     SDL_Event event;
 
@@ -364,7 +417,6 @@ void loopGame(SDL_Renderer *renderer) {
                 // On libère la mémoire avant de quitter
                 SDL_DestroyTexture(player.texture);
                 exit(0);
-                return;
             }
 
             // Si le joueur n'a plus de vie, on ouvre la fonction de game over
@@ -378,13 +430,12 @@ void loopGame(SDL_Renderer *renderer) {
 
                 playerIsDead(renderer, "../include/ressources/images/background/Gameover.bmp");
             }else{
-                handlePlayerMovement(&player, event, renderer, &enemy);
+                handlePlayerMovement(&player, event, renderer, &enemy, &object);
             }
         }
 
         // Déplacement de l'ennemi
-        moveEnemy(&enemy, renderer, &player);
+        moveEnemy(&enemy, renderer, &player, &object);
 
     }
 }
-
