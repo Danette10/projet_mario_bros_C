@@ -379,21 +379,6 @@ void createObject(Object *object, SDL_Renderer *renderer, int x, int y, char *na
     // Libérer la mémoire
     SDL_FreeSurface(objectImage);
 }
-// fonction qui permet de deplacer le paysage
-
-//fonction qui permet de deplacer le paysage
-void moveBackground(SDL_Renderer *renderer, int x, int y, int w, int h, int x_velocity) {
-    SDL_Rect rect;
-    rect.x = x;
-    rect.y = y;
-    rect.w = w;
-    rect.h = h;
-
-    SDL_RenderCopy(renderer, background, NULL, &rect);
-    SDL_RenderPresent(renderer);
-
-    SDL_Delay(100);
-}
 
 // Game loop
 void loopGame(SDL_Renderer *renderer) {
