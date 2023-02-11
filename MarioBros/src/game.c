@@ -46,6 +46,8 @@ void createBackground(SDL_Renderer *renderer, Background *background)
     SDL_Surface *backgroundImage = SDL_LoadBMP(background->imagePath);
 
     background->rect.w = backgroundImage->w;
+    background->rect.h = backgroundImage->h;
+    background->rect.y = -484;
 
     // Create texture from image
     background->texture = SDL_CreateTextureFromSurface(renderer, backgroundImage);
@@ -101,7 +103,6 @@ void initPlayer(Player *player, SDL_Renderer *renderer, char *name, char *imageP
 }
 
 
-bool keys[SDL_NUM_SCANCODES];
 bool isJumping = false;
 bool isMovingRight = false;
 
@@ -111,53 +112,92 @@ void handlePlayerMovement(Player *player, SDL_Event event, SDL_Renderer *rendere
     if (event.type == SDL_KEYUP) {
 
         if (event.key.keysym.sym == SDLK_RIGHT) {
-            keys[SDL_SCANCODE_RIGHT] = true;
 
             if (background->rect.x > -WIDTH) {
+
                 background->rect.x -= 10;
+
                 object->rect.x -= 10;
-                SDL_RenderCopy(renderer, object->texture, NULL, &object->rect);
+
             }
 
             isMovingRight = true;
         }
         if (event.key.keysym.sym == SDLK_LEFT) {
-            keys[SDL_SCANCODE_LEFT] = true;
 
             if (background->rect.x < 0) {
+
                 background->rect.x += 10;
+
                 object->rect.x += 10;
-                SDL_RenderCopy(renderer, object->texture, NULL, &object->rect);
+
             }
 
         }
-        if (event.key.keysym.sym == SDLK_SPACE) {
-            keys[SDL_SCANCODE_SPACE] = true;
-            // Déplacement du background pour sauter
-            if (background->rect.y > -HEIGHT) {
-                background->rect.y += 10;
-                object->rect.y += 10;
-                SDL_RenderCopy(renderer, object->texture, NULL, &object->rect);
-                enemy->rect.y += 10;
-                SDL_RenderCopy(renderer, enemy->texture, NULL, &enemy->rect);
+        if (event.key.keysym.sym == SDLK_UP) {
+
+            // jump player
+            if (player->rect.y == 125) {
+
+                int frameCounter = 0;
+
+                while (frameCounter < 30) {
+
+                    SDL_RenderClear(renderer);
+
+                    background->rect.y += 2;
+
+                    enemy->rect.y += 2;
+
+                    object->rect.y += 2;
+
+                    SDL_RenderCopy(renderer, background->texture, NULL, &background->rect);
+
+                    SDL_RenderCopy(renderer,enemy->texture, NULL, &enemy->rect);
+
+                    SDL_RenderCopy(renderer, object->texture, NULL, &object->rect);
+
+                    SDL_RenderCopy(renderer, player->texture, NULL, &player->rect);
+
+                    SDL_RenderPresent(renderer);
+
+                    SDL_Delay(10);
+
+                    frameCounter++;
+
+                }
+
+                while (frameCounter < 60) {
+
+                    SDL_RenderClear(renderer);
+
+                    background->rect.y -= 2;
+
+                    enemy->rect.y -= 2;
+
+                    object->rect.y -= 2;
+
+                    SDL_RenderCopy(renderer, background->texture, NULL, &background->rect);
+
+                    SDL_RenderCopy(renderer,enemy->texture, NULL, &enemy->rect);
+
+                    SDL_RenderCopy(renderer, object->texture, NULL, &object->rect);
+
+                    SDL_RenderCopy(renderer, player->texture, NULL, &player->rect);
+
+                    SDL_RenderPresent(renderer);
+
+                    SDL_Delay(10);
+
+                    frameCounter++;
+
+                }
+
+
             }
-            isJumping = true;
 
         }
 
-    }
-        // check for key release events
-    else if (event.type == SDL_KEYUP) {
-        if (event.key.keysym.sym == SDLK_RIGHT) {
-            keys[SDL_SCANCODE_RIGHT] = false;
-            isMovingRight = false;
-        }
-        if (event.key.keysym.sym == SDLK_LEFT) {
-            keys[SDL_SCANCODE_LEFT] = false;
-        }
-        if (event.key.keysym.sym == SDLK_SPACE) {
-            keys[SDL_SCANCODE_SPACE] = false;
-        }
     }
 
     if (isJumping && checkCollision(player->rect, enemy->rect)) {
@@ -184,27 +224,15 @@ void handlePlayerMovement(Player *player, SDL_Event event, SDL_Renderer *rendere
     // clear the renderer
     SDL_RenderClear(renderer);
 
+    SDL_RenderCopy(renderer, background->texture, NULL, &background->rect);
+
+    SDL_RenderCopy(renderer, object->texture, NULL, &object->rect);
+
+    SDL_RenderCopy(renderer, enemy->texture, NULL, &enemy->rect);
+
     // move the enemy
     moveEnemy(enemy, renderer, player, object, background);
 
-    // render the player's texture
-    SDL_Delay(10);
-    SDL_RenderCopy(renderer, player->texture, NULL, &player->rect);
-
-    // Attendre 10ms et faire tomber le joueur et redepacer le background
-    SDL_Delay(10);
-    if (background->rect.y > 0) {
-        background->rect.y -= 10;
-        object->rect.y -= 10;
-        SDL_RenderCopy(renderer, object->texture, NULL, &object->rect);
-        enemy->rect.y -= 10;
-        SDL_RenderCopy(renderer, enemy->texture, NULL, &enemy->rect);
-    }
-
-    // Si le joueur est en train de sauter, il ne peux pas cliquer sur la touche espace
-    if (isJumping) {
-        keys[SDL_SCANCODE_SPACE] = false;
-    }
 }
 
 // Function to check if the player is dead
@@ -362,7 +390,8 @@ void enemyDeath(Enemy *enemy, SDL_Renderer *renderer, Player *player, Object *ob
 
     SDL_RenderPresent(renderer);
 
-    SDL_Delay(1000);
+    SDL_Delay(10);
+
 }
 
 // Function to create a new object
@@ -423,8 +452,6 @@ void loopGame(SDL_Renderer *renderer) {
     Background background;
     background.imagePath = "../include/ressources/images/background/desert/desert1.bmp";
     background.rect.x = 0;
-    background.rect.y = 0;
-    background.rect.h = HEIGHT;
     createBackground(renderer, &background);
 
     SDL_Event event;
