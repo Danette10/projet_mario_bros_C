@@ -130,7 +130,7 @@ void handlePlayerMovement(Player *player, SDL_Event event, SDL_Renderer *rendere
 
                 object->rect.y += 2;
 
-                player->rect.x += 2;
+                player->rect.x += 1;
 
                 SDL_RenderCopy(renderer, background->texture, NULL, &background->rect);
 
@@ -158,7 +158,7 @@ void handlePlayerMovement(Player *player, SDL_Event event, SDL_Renderer *rendere
 
                 object->rect.y -= 2;
 
-                player->rect.x += 2;
+                player->rect.x += 1;
 
                 SDL_RenderCopy(renderer, background->texture, NULL, &background->rect);
 
@@ -179,7 +179,6 @@ void handlePlayerMovement(Player *player, SDL_Event event, SDL_Renderer *rendere
         }
 
         SDL_PumpEvents();
-        SDL_FlushEvent(SDL_KEYDOWN);
         SDL_FlushEvent(SDL_KEYUP);
 
     }else if (event.type == SDL_KEYUP) {
@@ -205,6 +204,8 @@ void handlePlayerMovement(Player *player, SDL_Event event, SDL_Renderer *rendere
                 object->rect.x += 10;
 
             }
+
+            isMovingRight = false;
 
         }
         if (event.key.keysym.sym == SDLK_UP) {
