@@ -3,3 +3,4 @@ cmake-build-debug/
 CMakeLists.txt
 src/*.o
 bin/MarioBros.exe
+include/ressources/scores/*.txt
