@@ -108,8 +108,81 @@ bool isMovingRight = false;
 
 // Function to handle player movement
 void handlePlayerMovement(Player *player, SDL_Event event, SDL_Renderer *renderer, Enemy *enemy, Object *object, Background *background) {
-    // check for key press events
-    if (event.type == SDL_KEYUP) {
+
+    const Uint8 *state = SDL_GetKeyboardState(NULL);
+
+    if (state[SDL_SCANCODE_RIGHT] && state[SDL_SCANCODE_UP]) {
+
+        // jump player diagonally
+        if (player->rect.y == 125) {
+
+            isJumping = true;
+
+            int frameCounter = 0;
+
+            while (frameCounter < 30) {
+
+                SDL_RenderClear(renderer);
+
+                background->rect.y += 2;
+
+                enemy->rect.y += 2;
+
+                object->rect.y += 2;
+
+                player->rect.x += 2;
+
+                SDL_RenderCopy(renderer, background->texture, NULL, &background->rect);
+
+                SDL_RenderCopy(renderer, enemy->texture, NULL, &enemy->rect);
+
+                SDL_RenderCopy(renderer, object->texture, NULL, &object->rect);
+
+                SDL_RenderCopy(renderer, player->texture, NULL, &player->rect);
+
+                SDL_RenderPresent(renderer);
+
+                SDL_Delay(10);
+
+                frameCounter++;
+
+            }
+
+            while (frameCounter < 60) {
+
+                SDL_RenderClear(renderer);
+
+                background->rect.y -= 2;
+
+                enemy->rect.y -= 2;
+
+                object->rect.y -= 2;
+
+                player->rect.x += 2;
+
+                SDL_RenderCopy(renderer, background->texture, NULL, &background->rect);
+
+                SDL_RenderCopy(renderer, enemy->texture, NULL, &enemy->rect);
+
+                SDL_RenderCopy(renderer, object->texture, NULL, &object->rect);
+
+                SDL_RenderCopy(renderer, player->texture, NULL, &player->rect);
+
+                SDL_RenderPresent(renderer);
+
+                SDL_Delay(10);
+
+                frameCounter++;
+
+            }
+
+        }
+
+        SDL_PumpEvents();
+        SDL_FlushEvent(SDL_KEYDOWN);
+        SDL_FlushEvent(SDL_KEYUP);
+
+    }else if (event.type == SDL_KEYUP) {
 
         if (event.key.keysym.sym == SDLK_RIGHT) {
 
@@ -139,6 +212,8 @@ void handlePlayerMovement(Player *player, SDL_Event event, SDL_Renderer *rendere
             // jump player
             if (player->rect.y == 125) {
 
+                isJumping = true;
+
                 int frameCounter = 0;
 
                 while (frameCounter < 30) {
@@ -153,7 +228,7 @@ void handlePlayerMovement(Player *player, SDL_Event event, SDL_Renderer *rendere
 
                     SDL_RenderCopy(renderer, background->texture, NULL, &background->rect);
 
-                    SDL_RenderCopy(renderer,enemy->texture, NULL, &enemy->rect);
+                    SDL_RenderCopy(renderer, enemy->texture, NULL, &enemy->rect);
 
                     SDL_RenderCopy(renderer, object->texture, NULL, &object->rect);
 
@@ -179,7 +254,7 @@ void handlePlayerMovement(Player *player, SDL_Event event, SDL_Renderer *rendere
 
                     SDL_RenderCopy(renderer, background->texture, NULL, &background->rect);
 
-                    SDL_RenderCopy(renderer,enemy->texture, NULL, &enemy->rect);
+                    SDL_RenderCopy(renderer, enemy->texture, NULL, &enemy->rect);
 
                     SDL_RenderCopy(renderer, object->texture, NULL, &object->rect);
 
@@ -192,7 +267,6 @@ void handlePlayerMovement(Player *player, SDL_Event event, SDL_Renderer *rendere
                     frameCounter++;
 
                 }
-
 
             }
 
@@ -213,7 +287,7 @@ void handlePlayerMovement(Player *player, SDL_Event event, SDL_Renderer *rendere
 
         if (player->rect.y == 125 && checkCollision(player->rect, enemy->rect)) {
             if(player->pv > 0){
-                player->pv -= 50;
+                player->pv -= 10;
             }else{
                 player->pv = 0;
                 return;
@@ -232,6 +306,8 @@ void handlePlayerMovement(Player *player, SDL_Event event, SDL_Renderer *rendere
 
     // move the enemy
     moveEnemy(enemy, renderer, player, object, background);
+
+    isJumping = false;
 
 }
 
@@ -349,7 +425,7 @@ void moveEnemy(Enemy *enemy, SDL_Renderer *renderer, Player *player, Object *obj
 
     if (player->rect.y == 125 && checkCollision(enemy->rect, player->rect)) {
         if(player->pv > 0){
-            player->pv -= 50;
+            player->pv -= 10;
         }else{
             player->pv = 0;
             // Supprimer le joueur
@@ -390,7 +466,7 @@ void enemyDeath(Enemy *enemy, SDL_Renderer *renderer, Player *player, Object *ob
 
     SDL_RenderPresent(renderer);
 
-    SDL_Delay(10);
+    SDL_Delay(200);
 
 }
 
