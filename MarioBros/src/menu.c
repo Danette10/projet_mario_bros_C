@@ -34,7 +34,7 @@ void writeTextOnScreen(char *text, int x, int y, int size, SDL_Renderer *rendere
     SDL_Rect rect1;
     rect1.x = x;
     rect1.y = y;
-    rect1.w = 150;
+    rect1.w = 20;
     rect1.h = 50;
 
     SDL_RenderCopy(renderer, texture1, NULL, &rect1);
@@ -79,8 +79,18 @@ void displayMenu(Menu *menu, Renderer *renderer) {
 
         int text = readTextFile("../include/ressources/scores/deaths.txt");
         char text2[100];
-        sprintf(text2, "Morts : %d", text);
-        writeTextOnScreen(text2, 15, 80, 80, renderer);
+        // Afficher une image de mort pour illustrer le nombre de morts
+        SDL_Rect rect;
+        rect.x = 10;
+        rect.y = 90;
+        rect.w = 30;
+        rect.h = 30;
+        SDL_Surface *death = SDL_LoadBMP("../include/ressources/images/menu/death.bmp");
+        SDL_Texture *textureDeath = SDL_CreateTextureFromSurface(renderer, death);
+        SDL_RenderCopy(renderer, textureDeath, NULL, &rect);
+        SDL_RenderPresent(renderer);
+        sprintf(text2, "%d", text);
+        writeTextOnScreen(text2, 50, 80, 80, renderer);
 
     }
 }
