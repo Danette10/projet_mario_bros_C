@@ -1,4 +1,5 @@
 #include <SDL_video.h>
+#include <SDL_ttf.h>
 #include "define.h"
 
 typedef SDL_Renderer Renderer;
@@ -16,6 +17,9 @@ void initMenu(Menu *menu, int optionCount);
 
 // Add an option (BMP file) to the menu
 void addOption(Menu *menu, char *option, int index);
+
+// Write text on the screen
+void writeTextOnScreen(char *text, int x, int y, int size, SDL_Renderer *renderer);
 
 // Display the menu on the screen using the provided renderer
 void displayMenu(Menu *menu, Renderer *renderer);
