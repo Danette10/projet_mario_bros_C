@@ -105,6 +105,7 @@ void initPlayer(Player *player, SDL_Renderer *renderer, char *name, char *imageP
 
 bool isJumping = false;
 bool isMovingRight = false;
+bool isMovingLeft = false;
 
 // Function to handle player movement
 void handlePlayerMovement(Player *player, SDL_Event event, SDL_Renderer *renderer, Enemy *enemy, Object *object, Background *background) {
@@ -112,6 +113,9 @@ void handlePlayerMovement(Player *player, SDL_Event event, SDL_Renderer *rendere
     const Uint8 *state = SDL_GetKeyboardState(NULL);
 
     if (state[SDL_SCANCODE_RIGHT] && state[SDL_SCANCODE_UP]) {
+
+        isMovingLeft = false;
+        isMovingRight = true;
 
         // jump player diagonally
         if (player->rect.y == 125) {
@@ -126,11 +130,24 @@ void handlePlayerMovement(Player *player, SDL_Event event, SDL_Renderer *rendere
 
                 background->rect.y += 2;
 
+                // Si le background est toujours dans la fenêtre on bouge le background sinon on bouge le joueur
+                if (background->rect.x > -WIDTH) {
+
+                    background->rect.x -= 2;
+
+                    object->rect.x -= 2;
+
+                    enemy->rect.x -= 2;
+
+                } else {
+
+                    player->rect.x += 2;
+
+                }
+
                 enemy->rect.y += 2;
 
                 object->rect.y += 2;
-
-                player->rect.x += 1;
 
                 SDL_RenderCopy(renderer, background->texture, NULL, &background->rect);
 
@@ -154,11 +171,24 @@ void handlePlayerMovement(Player *player, SDL_Event event, SDL_Renderer *rendere
 
                 background->rect.y -= 2;
 
+                // Si le background est toujours dans la fenêtre on bouge le background sinon on bouge le joueur
+                if (background->rect.x > -WIDTH) {
+
+                    background->rect.x -= 2;
+
+                    object->rect.x -= 2;
+
+                    enemy->rect.x -= 2;
+
+                } else {
+
+                    player->rect.x += 2;
+
+                }
+
                 enemy->rect.y -= 2;
 
                 object->rect.y -= 2;
-
-                player->rect.x += 1;
 
                 SDL_RenderCopy(renderer, background->texture, NULL, &background->rect);
 
@@ -181,6 +211,106 @@ void handlePlayerMovement(Player *player, SDL_Event event, SDL_Renderer *rendere
         SDL_PumpEvents();
         SDL_FlushEvent(SDL_KEYUP);
 
+    }else if(state[SDL_SCANCODE_LEFT] && state[SDL_SCANCODE_UP]) {
+
+        isMovingLeft = true;
+        isMovingRight = false;
+
+        // jump player diagonally
+        if (player->rect.y == 125) {
+
+            isJumping = true;
+
+            int frameCounter = 0;
+
+            while (frameCounter < 30) {
+
+                SDL_RenderClear(renderer);
+
+                background->rect.y += 2;
+
+                // Si le background est toujours dans la fenêtre on bouge le background sinon on bouge le joueur
+                if (background->rect.x < 0) {
+
+                    background->rect.x += 2;
+
+                    object->rect.x += 2;
+
+                    enemy->rect.x += 2;
+
+                } else {
+
+                    player->rect.x -= 2;
+
+                }
+
+                enemy->rect.y += 2;
+
+                object->rect.y += 2;
+
+                SDL_RenderCopy(renderer, background->texture, NULL, &background->rect);
+
+                SDL_RenderCopy(renderer, enemy->texture, NULL, &enemy->rect);
+
+                SDL_RenderCopy(renderer, object->texture, NULL, &object->rect);
+
+                SDL_RenderCopyEx(renderer, player->texture, NULL, &player->rect, 0, NULL, SDL_FLIP_HORIZONTAL);
+
+                SDL_RenderPresent(renderer);
+
+                SDL_Delay(10);
+
+                frameCounter++;
+
+            }
+
+            while (frameCounter < 60) {
+
+                SDL_RenderClear(renderer);
+
+                background->rect.y -= 2;
+
+                // Si le background est toujours dans la fenêtre on bouge le background sinon on bouge le joueur
+                if (background->rect.x < 0) {
+
+                    background->rect.x += 2;
+
+                    object->rect.x += 2;
+
+                    enemy->rect.x += 2;
+
+                } else {
+
+                    player->rect.x -= 2;
+
+                }
+
+                enemy->rect.y -= 2;
+
+                object->rect.y -= 2;
+
+                SDL_RenderCopy(renderer, background->texture, NULL, &background->rect);
+
+                SDL_RenderCopy(renderer, enemy->texture, NULL, &enemy->rect);
+
+                SDL_RenderCopy(renderer, object->texture, NULL, &object->rect);
+
+                SDL_RenderCopyEx(renderer, player->texture, NULL, &player->rect, 0, NULL, SDL_FLIP_HORIZONTAL);
+
+                SDL_RenderPresent(renderer);
+
+                SDL_Delay(10);
+
+                frameCounter++;
+
+            }
+
+        }
+
+        SDL_PumpEvents();
+        SDL_FlushEvent(SDL_KEYDOWN);
+        SDL_FlushEvent(SDL_KEYUP);
+
     }else if (event.type == SDL_KEYUP) {
 
         if (event.key.keysym.sym == SDLK_RIGHT) {
@@ -191,9 +321,14 @@ void handlePlayerMovement(Player *player, SDL_Event event, SDL_Renderer *rendere
 
                 object->rect.x -= 10;
 
+            }else if(player->rect.x < WIDTH - player->rect.w) {
+
+                player->rect.x += 10;
+
             }
 
             isMovingRight = true;
+            isMovingLeft = false;
         }
         if (event.key.keysym.sym == SDLK_LEFT) {
 
@@ -203,10 +338,15 @@ void handlePlayerMovement(Player *player, SDL_Event event, SDL_Renderer *rendere
 
                 object->rect.x += 10;
 
+            }else if(player->rect.x > 100) {
+
+                player->rect.x -= 10;
+
             }
 
-            isMovingRight = false;
+            isMovingLeft = true;
 
+            isMovingRight = false;
         }
         if (event.key.keysym.sym == SDLK_UP) {
 
@@ -233,7 +373,15 @@ void handlePlayerMovement(Player *player, SDL_Event event, SDL_Renderer *rendere
 
                     SDL_RenderCopy(renderer, object->texture, NULL, &object->rect);
 
-                    SDL_RenderCopy(renderer, player->texture, NULL, &player->rect);
+                    if(isMovingLeft){
+
+                        SDL_RenderCopyEx(renderer, player->texture, NULL, &player->rect, 0, NULL, SDL_FLIP_HORIZONTAL);
+
+                    }else{
+
+                        SDL_RenderCopy(renderer, player->texture, NULL, &player->rect);
+
+                    }
 
                     SDL_RenderPresent(renderer);
 
@@ -259,7 +407,15 @@ void handlePlayerMovement(Player *player, SDL_Event event, SDL_Renderer *rendere
 
                     SDL_RenderCopy(renderer, object->texture, NULL, &object->rect);
 
-                    SDL_RenderCopy(renderer, player->texture, NULL, &player->rect);
+                    if(isMovingLeft){
+
+                        SDL_RenderCopyEx(renderer, player->texture, NULL, &player->rect, 0, NULL, SDL_FLIP_HORIZONTAL);
+
+                    }else{
+
+                        SDL_RenderCopy(renderer, player->texture, NULL, &player->rect);
+
+                    }
 
                     SDL_RenderPresent(renderer);
 
@@ -415,7 +571,15 @@ void moveEnemy(Enemy *enemy, SDL_Renderer *renderer, Player *player, Object *obj
 
     SDL_RenderCopy(renderer, enemy->texture, NULL, &enemy->rect);
 
-    SDL_RenderCopy(renderer, player->texture, NULL, &player->rect);
+    if(isMovingLeft){
+
+        SDL_RenderCopyEx(renderer, player->texture, NULL, &player->rect, 0, NULL, SDL_FLIP_HORIZONTAL);
+
+    }else{
+
+        SDL_RenderCopy(renderer, player->texture, NULL, &player->rect);
+
+    }
 
     // Afficher l'objet en prenant en compte le décalage du fond
     SDL_RenderCopy(renderer, object->texture, NULL, &object->rect);

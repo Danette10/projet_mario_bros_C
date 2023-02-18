@@ -93,6 +93,11 @@ void handleMenuNavigation(Menu *menu, Renderer *renderer, SDL_Event *event) {
 
                         break;
 
+                    case 3:
+
+                        SDL_Quit();
+                        exit(0);
+
                 }
 
                 break;

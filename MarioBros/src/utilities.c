@@ -1,6 +1,3 @@
-
-#include <SDL.h>
-#include <SDL_audio.h>
 #include "../include/headers/utilities.h"
 
 // Function to play music
@@ -29,8 +26,29 @@ void playMusic(char *musicPath, int type) {
 
 }
 
+// Function to create a new folder if it doesn't exist
+void createFolder(char *folderPath) {
+
+    DIR* dir = opendir(folderPath);
+
+    if (dir) {
+
+        closedir(dir);
+
+    } else {
+
+        printf("Le dossier %s n'existe pas, création en cours...\n", folderPath);
+
+        mkdir(folderPath);
+
+    }
+
+}
+
 // Function to write text in file
 void writeTextFile(int text, char *filePath) {
+
+    createFolder("../include/ressources/scores");
 
     FILE *file = fopen(filePath, "w");
 
@@ -50,6 +68,8 @@ void writeTextFile(int text, char *filePath) {
 
 // Function to read text in file
 int readTextFile(char *filePath) {
+
+    createFolder("../include/ressources/scores");
 
     FILE *file = fopen(filePath, "r");
 
