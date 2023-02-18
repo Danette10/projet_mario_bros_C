@@ -49,7 +49,6 @@ int main(int argc, char *argv[]) {
     addOption(&menu, "../include/ressources/images/menu/menu_shop_selected.bmp", 2);
     addOption(&menu, "../include/ressources/images/menu/menu_quit_selected.bmp", 3);
 
-    displayMenu(&menu, renderer);
 
     while (1) {
 
@@ -67,6 +66,7 @@ int main(int argc, char *argv[]) {
                 return 0;
 
             }
+
             handleMenuNavigation(&menu, renderer, &event);
 
         }
