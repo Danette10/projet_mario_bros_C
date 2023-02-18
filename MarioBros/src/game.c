@@ -209,7 +209,6 @@ void handlePlayerMovement(Player *player, SDL_Event event, SDL_Renderer *rendere
         }
 
         SDL_PumpEvents();
-        SDL_FlushEvent(SDL_KEYDOWN);
         SDL_FlushEvent(SDL_KEYUP);
 
     }else if(state[SDL_SCANCODE_LEFT] && state[SDL_SCANCODE_UP]) {
