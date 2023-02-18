@@ -1,6 +1,7 @@
 #include <SDL.h>
 #include "../include/headers/menu.h"
 #include "../include/headers/game.h"
+#include "../include/headers/utilities.h"
 
 
 // Initialize a new menu with a given number of options
@@ -13,6 +14,43 @@ void initMenu(Menu *menu, int optionCount) {
 // Add an option (BMP file) to the menu
 void addOption(Menu *menu, char *option, int index) {
     menu->options[index] = option;
+}
+
+// Write text on the screen
+void writeTextOnScreen(char *text, int x, int y, int size, SDL_Renderer *renderer) {
+
+    if (TTF_Init() != 0)
+    {
+        fprintf(stderr, "Erreur d'initialisation TTF : %s\n", TTF_GetError());
+    }
+
+    TTF_Font * font1;
+    font1 = TTF_OpenFont("../include/ressources/fonts/Raleway.ttf", size);
+
+    SDL_Color color1 = {0, 0, 0};
+    SDL_Surface * surface1 = TTF_RenderText_Blended(font1, text, color1);
+    SDL_Texture * texture1 = SDL_CreateTextureFromSurface(renderer, surface1);
+
+    SDL_Rect rect1;
+    rect1.x = x;
+    rect1.y = y;
+    rect1.w = 150;
+    rect1.h = 50;
+
+    SDL_RenderCopy(renderer, texture1, NULL, &rect1);
+    SDL_RenderPresent(renderer);
+
+    // Ne pas prendre en compte les events de la souris
+    SDL_EventState(SDL_MOUSEMOTION, SDL_IGNORE);
+
+    TTF_CloseFont(font1);
+
+    SDL_FreeSurface(surface1);
+
+    SDL_DestroyTexture(texture1);
+
+    TTF_Quit();
+
 }
 
 // Display the menu on the screen using the provided renderer
@@ -34,6 +72,17 @@ void displayMenu(Menu *menu, Renderer *renderer) {
     // Free the memory
     SDL_DestroyTexture(texture);
     SDL_FreeSurface(currentOption);
+
+    DIR* dir = opendir("../include/ressources/scores");
+
+    if (dir) {
+
+        int text = readTextFile("../include/ressources/scores/deaths.txt");
+        char text2[100];
+        sprintf(text2, "Morts : %d", text);
+        writeTextOnScreen(text2, 15, 80, 80, renderer);
+
+    }
 }
 
 // Function to delete the menu
@@ -47,6 +96,7 @@ void deleteMenu(Menu *menu) {
 }
 
 void handleMenuNavigation(Menu *menu, Renderer *renderer, SDL_Event *event) {
+
     // Handle arrow key presses for menu navigation
     if (event->type == SDL_KEYDOWN) {
 
