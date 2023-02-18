@@ -75,22 +75,34 @@ void displayMenu(Menu *menu, Renderer *renderer) {
 
     DIR* dir = opendir("../include/ressources/scores");
 
+    // Afficher une image de mort pour illustrer le nombre de morts
+    SDL_Rect rect;
+    rect.x = 10;
+    rect.y = 90;
+    rect.w = 30;
+    rect.h = 30;
+    SDL_Surface *death = SDL_LoadBMP("../include/ressources/images/menu/death.bmp");
+    SDL_Texture *textureDeath = SDL_CreateTextureFromSurface(renderer, death);
+    SDL_RenderCopy(renderer, textureDeath, NULL, &rect);
+    SDL_RenderPresent(renderer);
+
     if (dir) {
 
         int text = readTextFile("../include/ressources/scores/deaths.txt");
+
+        // Si le fichier n'existe pas, on affiche 0
+
+        if(text == -1){
+            text = 0;
+        }
         char text2[100];
-        // Afficher une image de mort pour illustrer le nombre de morts
-        SDL_Rect rect;
-        rect.x = 10;
-        rect.y = 90;
-        rect.w = 30;
-        rect.h = 30;
-        SDL_Surface *death = SDL_LoadBMP("../include/ressources/images/menu/death.bmp");
-        SDL_Texture *textureDeath = SDL_CreateTextureFromSurface(renderer, death);
-        SDL_RenderCopy(renderer, textureDeath, NULL, &rect);
-        SDL_RenderPresent(renderer);
+
         sprintf(text2, "%d", text);
         writeTextOnScreen(text2, 50, 80, 80, renderer);
+
+    }else{
+
+        writeTextOnScreen("0", 50, 80, 80, renderer);
 
     }
 }
