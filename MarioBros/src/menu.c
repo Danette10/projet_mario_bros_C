@@ -38,10 +38,6 @@ void writeTextOnScreen(char *text, int x, int y, int size, SDL_Renderer *rendere
     rect1.h = 50;
 
     SDL_RenderCopy(renderer, texture1, NULL, &rect1);
-    SDL_RenderPresent(renderer);
-
-    // Ne pas prendre en compte les events de la souris
-    SDL_EventState(SDL_MOUSEMOTION, SDL_IGNORE);
 
     TTF_CloseFont(font1);
 
@@ -67,11 +63,6 @@ void displayMenu(Menu *menu, Renderer *renderer) {
 
     // Display the texture in the window
     SDL_RenderCopy(renderer, texture, NULL, NULL);
-    SDL_RenderPresent(renderer);
-
-    // Free the memory
-    SDL_DestroyTexture(texture);
-    SDL_FreeSurface(currentOption);
 
     DIR* dir = opendir("../include/ressources/scores");
 
@@ -84,7 +75,6 @@ void displayMenu(Menu *menu, Renderer *renderer) {
     SDL_Surface *death = SDL_LoadBMP("../include/ressources/images/menu/death.bmp");
     SDL_Texture *textureDeath = SDL_CreateTextureFromSurface(renderer, death);
     SDL_RenderCopy(renderer, textureDeath, NULL, &rect);
-    SDL_RenderPresent(renderer);
 
     if (dir) {
 
@@ -105,6 +95,12 @@ void displayMenu(Menu *menu, Renderer *renderer) {
         writeTextOnScreen("0", 50, 80, 80, renderer);
 
     }
+
+    SDL_RenderPresent(renderer);
+
+    // Free the memory
+    SDL_DestroyTexture(texture);
+    SDL_FreeSurface(currentOption);
 }
 
 // Function to delete the menu
@@ -120,7 +116,7 @@ void deleteMenu(Menu *menu) {
 void handleMenuNavigation(Menu *menu, Renderer *renderer, SDL_Event *event) {
 
     // Handle arrow key presses for menu navigation
-    if (event->type == SDL_KEYDOWN) {
+    if (event->type == SDL_KEYUP) {
 
         switch (event->key.keysym.sym) {
 
@@ -156,6 +152,10 @@ void handleMenuNavigation(Menu *menu, Renderer *renderer, SDL_Event *event) {
 
                 switch (menu->currentIndex) {
 
+                    /**
+                     * New game
+                     */
+
                     case 0:
 
                         // Suppression du menu
@@ -164,6 +164,11 @@ void handleMenuNavigation(Menu *menu, Renderer *renderer, SDL_Event *event) {
                         loopGame(renderer);
 
                         break;
+
+
+                    /**
+                     * Quit the game
+                     */
 
                     case 3:
 
