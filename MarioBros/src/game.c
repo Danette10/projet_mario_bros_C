@@ -393,16 +393,14 @@ void handlePlayerMovement(Player *player, SDL_Event event, SDL_Renderer *rendere
 
             }
 
-        }
+        } else if(background->rect.x >= -350 && background->rect.x <= -330) {
 
-        if(background->rect.x >= -330 && background->rect.x <= -350) {
             SDL_PumpEvents();
             SDL_FlushEvent(SDL_KEYDOWN);
             SDL_FlushEvent(SDL_KEYUP);
 
             int frameCounter = 0;
 
-            // Faire tomber le joueur jusqu'à ce qu'il sorte de la fenêtre
             while (player->rect.y < HEIGHT) {
 
                 SDL_RenderClear(renderer);
@@ -415,15 +413,8 @@ void handlePlayerMovement(Player *player, SDL_Event event, SDL_Renderer *rendere
 
                 SDL_RenderCopy(renderer, object->texture, NULL, &object->rect);
 
-                if (isMovingLeft) {
-
-                    SDL_RenderCopyEx(renderer, player->texture, NULL, &player->rect, 0, NULL, SDL_FLIP_HORIZONTAL);
-
-                } else {
-
-                    SDL_RenderCopy(renderer, player->texture, NULL, &player->rect);
-
-                }
+                // Mettre la tete du joueur à l'envers
+                SDL_RenderCopyEx(renderer, player->texture, NULL, &player->rect, 180, NULL, SDL_FLIP_HORIZONTAL);
 
                 SDL_RenderPresent(renderer);
 
